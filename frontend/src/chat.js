@@ -63,6 +63,14 @@ function bindUI() {
   document.getElementById('fit-width').addEventListener('click', () => setZoom(1));
   document.getElementById('fit-page').addEventListener('click', () => setZoom(.82));
   document.getElementById('mobile-pdf-tab').addEventListener('click', toggleMobilePdf);
+  document.getElementById('repurpose-chat-btn')?.addEventListener('click', () => {
+    if (currentPdf) {
+      const clean = currentPdf.replace(/\.pdf$/i, '').replace(/[-_]+/g, ' ');
+      window.location.href = `/dashboard.html?tab=studio&topic=${encodeURIComponent(clean)}&pdf=${encodeURIComponent(currentPdf)}`;
+    } else {
+      window.location.href = '/dashboard.html?tab=studio';
+    }
+  });
   
   const input = document.getElementById('chat-input');
   input.addEventListener('keydown', event => {

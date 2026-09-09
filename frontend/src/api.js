@@ -42,6 +42,21 @@ export async function apiFetch(endpoint, options = {}) {
   return data;
 }
 
+export async function apiPost(endpoint, data = {}, options = {}) {
+  return apiFetch(endpoint, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    ...options
+  });
+}
+
+export async function apiGet(endpoint, options = {}) {
+  return apiFetch(endpoint, {
+    method: 'GET',
+    ...options
+  });
+}
+
 export function checkAuth() {
   const sessionId = localStorage.getItem('session_id');
   if (!sessionId) {

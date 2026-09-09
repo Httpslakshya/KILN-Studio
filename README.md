@@ -1,12 +1,21 @@
-# 🧠 DocMind
+# 🧠 DocMind: AI-Powered PDF Chat & Live Verified Intelligence Platform
 
-> Chat with PDFs, generate summaries, notes, quizzes, and retrieve context-aware answers using AI.
+> Chat with PDFs, generate summaries, notes, and quizzes, or run autonomous 4-agent creator pipelines with real-time verified intelligence.
 
 ![Python](https://img.shields.io/badge/Python-FastAPI-blue)
-![React](https://img.shields.io/badge/React-Vite-61DAFB)
+![React](https://img.shields.io/badge/Frontend-Vite-61DAFB)
 ![Qdrant](https://img.shields.io/badge/VectorDB-Qdrant-red)
-![Supabase](https://img.shields.io/badge/Storage-Supabase-green)
-![Gemini](https://img.shields.io/badge/AI-Google_Gemini-orange)
+![AgentPrahari](https://img.shields.io/badge/Security-AgentPrahari-purple)
+![AI](https://img.shields.io/badge/AI-Groq%20%7C%20OpenRouter%20%7C%20Gemini-orange)
+
+DocMind is a Neobrutalist AI platform combining static document intelligence with real-time, multi-source verified RAG, an autonomous 4-agent content pipeline, an Anthropic-compliant Model Context Protocol (MCP) server, and production guardrails powered by [**AgentPrahari**](https://pypi.org/project/agentprahari/) on PyPI.
+
+### 🌟 Core Architectural Pillars
+1. **🛡️ AgentPrahari Guardrails**: Integrated from PyPI to protect prompts and completions against prompt injections, jailbreaks (DAN), PII leakage (emails, phone numbers, API keys), and ungrounded hallucinations.
+2. **🌐 Live / Verified Agentic RAG**: Real-time RSS & news stream ingestion, exponential time-decay freshness scoring ($e^{-\lambda \Delta t}$), and cross-source consensus verification ($\ge 2$ independent publisher domains).
+3. **🤖 Autonomous 4-Agent Content Pipeline**: Supervisor/Critic pattern (**Researcher** $\to$ **Verifier** $\to$ **Writer** $\to$ **Editor**) with automated revision feedback cycles.
+4. **🔌 Model Context Protocol (MCP) Server**: Exposes guardrails, verified live search, and content generation as standard tools to Claude Desktop, Cursor, and any MCP client.
+5. **📄 Cited PDF Workspace**: Neobrutalist RAG chat with page-level clickable citations and vector indexing via Qdrant/ChromaDB.
 
 ---
 

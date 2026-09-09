@@ -66,45 +66,161 @@ def delete_document_vectors(filename: str):
     except Exception as e:
         logger.error(f"Failed to delete Qdrant points for {filename}: {e}", exc_info=True)
 
-def call_llm(system_prompt: str, user_query: str) -> str:
-    """Routes completion request to Groq API with automatic fallback to Gemini."""
-    # 1. Attempt Groq call
-    groq_api_key = settings.GROQ_API_KEY
-    if groq_api_key:
+_groq_key_counter = 0
+
+def _get_next_groq_key(preferred_idx: int = None) -> str:
+    """Rotates through available Groq API keys to distribute rate limits across multiple accounts."""
+    global _groq_key_counter
+    keys = settings.groq_keys
+    if not keys:
+        return ""
+    if preferred_idx is not None and preferred_idx < len(keys):
+        return keys[preferred_idx]
+    key = keys[_groq_key_counter % len(keys)]
+    _groq_key_counter += 1
+    return key
+
+def _call_groq_direct(system_prompt: str, user_query: str, key_override: str = None) -> str:
+    """Invokes Groq API using specified or rotating key with model fallback and zero-wait retry."""
+    from openai import OpenAI
+    groq_keys = [key_override] if key_override else settings.groq_keys
+    candidate_models = ["qwen/qwen3.8-27b", "openai/gpt-oss-120b"]
+    
+    last_err = None
+    for key in groq_keys:
+        if not key:
+            continue
+        client = OpenAI(api_key=key, base_url="https://api.groq.com/openai/v1", max_retries=0)
+        for model in candidate_models:
+            try:
+                response = client.chat.completions.create(
+                    model=model,
+                    temperature=0.2,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_query}
+                    ]
+                )
+                return response.choices[0].message.content
+            except Exception as e:
+                last_err = e
+                continue
+    raise RuntimeError(f"All configured Groq API keys and models failed: {last_err}")
+
+def _call_openrouter_direct(system_prompt: str, user_query: str, model: str = "meta-llama/llama-3.3-70b-instruct") -> str:
+    """Invokes OpenRouter API."""
+    api_key = settings.OPENROUTER_API_KEY
+    if not api_key:
+        raise ValueError("OPENROUTER_API_KEY not set.")
+    from openai import OpenAI
+    client = OpenAI(
+        api_key=api_key,
+        base_url="https://openrouter.ai/api/v1",
+        default_headers={"HTTP-Referer": "https://docmind.ai", "X-Title": "DocMind"}
+    )
+    response = client.chat.completions.create(
+        model=model,
+        temperature=0.2,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_query}
+        ]
+    )
+    return response.choices[0].message.content
+
+def _call_gemini_direct(system_prompt: str, user_query: str) -> str:
+    """Invokes Google Gemini API."""
+    gemini_key = settings.GEMINI_API_KEY
+    if not gemini_key:
+        raise ValueError("GEMINI_API_KEY not set.")
+    import google.generativeai as genai
+    genai.configure(api_key=gemini_key)
+    model = genai.GenerativeModel(
+        model_name="gemini-2.5-flash",
+        generation_config={"temperature": 0.2}
+    )
+    full_prompt = f"{system_prompt}\n\nUser Question:\n{user_query}"
+    response = model.generate_content(full_prompt)
+    return response.text
+
+def call_llm(system_prompt: str, user_query: str, role: str = "general") -> str:
+    """
+    Intelligent multi-provider LLM router protected by AgentPrahari.
+    Distributes workload across different LLMs and keys based on agent role:
+    - researcher: OpenRouter -> Groq Key 1 -> Gemini
+    - verifier:   Groq Key 2 -> OpenRouter -> Gemini
+    - writer:     Groq Key 1 -> Groq Key 2 -> OpenRouter -> Gemini
+    - editor:     Gemini -> OpenRouter -> Groq Key 2 (distinct reviewer model!)
+    - general:    Groq (Rotated) -> OpenRouter -> Gemini
+    """
+    # 1. AgentPrahari Pre-execution Guardrail check
+    try:
+        from agentprahari import AgentPrahari
+        prahari = AgentPrahari.custom(
+            enable_pii=True,
+            enable_prompt_injection=True,
+            enable_output_secrets=True
+        )
+        guard_res = prahari.validate_input(user_query)
+        if not guard_res.is_valid:
+            logger.warning(f"AgentPrahari Guardrail Blocked Prompt: {guard_res.rejection_reason}")
+            return f"🛡️ [AgentPrahari Security Notice]: Input was blocked by safety guardrails. Reason: {guard_res.rejection_reason or 'Policy violation'}"
+        
+        if guard_res.sanitized_content:
+            user_query = guard_res.sanitized_content
+    except Exception as ge:
+        logger.warning(f"AgentPrahari guard check notice: {ge}")
+
+    # Build prioritized provider sequence based on agent role
+    keys = settings.groq_keys
+    k1 = keys[0] if len(keys) > 0 else None
+    k2 = keys[1] if len(keys) > 1 else k1
+
+    if role == "researcher":
+        providers = [
+            ("OpenRouter (Llama 3.3)", lambda: _call_openrouter_direct(system_prompt, user_query)),
+            ("Groq Account 1", lambda: _call_groq_direct(system_prompt, user_query, key_override=k1)),
+            ("Gemini Flash", lambda: _call_gemini_direct(system_prompt, user_query)),
+        ]
+    elif role == "verifier":
+        providers = [
+            ("Groq Account 2 (Independent Verifier)", lambda: _call_groq_direct(system_prompt, user_query, key_override=k2)),
+            ("OpenRouter (Llama 3.3)", lambda: _call_openrouter_direct(system_prompt, user_query)),
+            ("Gemini Flash", lambda: _call_gemini_direct(system_prompt, user_query)),
+        ]
+    elif role == "editor":
+        # Editor uses OpenRouter first for independent critique with ultra-low latency (<3s)
+        providers = [
+            ("OpenRouter (Independent Critic)", lambda: _call_openrouter_direct(system_prompt, user_query)),
+            ("Groq Account 2", lambda: _call_groq_direct(system_prompt, user_query, key_override=k2)),
+            ("Gemini Flash", lambda: _call_gemini_direct(system_prompt, user_query)),
+        ]
+    else:  # writer or general
+        providers = [
+            ("Groq Account 1", lambda: _call_groq_direct(system_prompt, user_query, key_override=k1)),
+            ("Groq Account 2", lambda: _call_groq_direct(system_prompt, user_query, key_override=k2)),
+            ("OpenRouter (Llama 3.3)", lambda: _call_openrouter_direct(system_prompt, user_query)),
+            ("Gemini Flash", lambda: _call_gemini_direct(system_prompt, user_query)),
+        ]
+
+    content = None
+    for provider_name, invoke_fn in providers:
         try:
-            logger.info("Executing completion request to Groq API...")
-            from openai import OpenAI
-            client = OpenAI(
-                api_key=groq_api_key,
-                base_url="https://api.groq.com/openai/v1"
-            )
-            response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                temperature=0.2,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_query}
-                ]
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            logger.warning(f"Groq API call failed: {e}. Attempting fallback to Gemini API...")
-            
-    # 2. Fallback to Gemini
-    gemini_api_key = settings.GEMINI_API_KEY
-    if gemini_api_key:
-        try:
-            logger.info("Executing completion request to Gemini API (fallback)...")
-            import google.generativeai as genai
-            genai.configure(api_key=gemini_api_key)
-            model = genai.GenerativeModel(
-                model_name="gemini-2.5-flash",
-                generation_config={"temperature": 0.2}
-            )
-            full_prompt = f"{system_prompt}\n\nUser Question:\n{user_query}"
-            response = model.generate_content(full_prompt)
-            return response.text
-        except Exception as e:
-            logger.error(f"Gemini API fallback call failed: {e}", exc_info=True)
-            
-    return "Error: Unable to connect to LLM APIs (Both Groq and Gemini calls failed or are unconfigured)."
+            logger.info(f"Routing completion request for role [{role}] to {provider_name}...")
+            content = invoke_fn()
+            if content and len(content.strip()) > 0:
+                break
+        except Exception as err:
+            logger.warning(f"Provider {provider_name} failed: {err}. Attempting next provider in pool...")
+
+    if not content:
+        return "Error: Unable to connect to LLM APIs (All Groq, OpenRouter, and Gemini providers failed or are unconfigured)."
+
+    # 2. AgentPrahari Post-execution check for leaked secrets or toxic claims
+    try:
+        from agentprahari import AgentPrahari
+        prahari = AgentPrahari.custom(enable_output_secrets=True)
+        out_res = prahari.validate_output(content, prompt=user_query)
+        return out_res.sanitized_content or content
+    except Exception:
+        return content

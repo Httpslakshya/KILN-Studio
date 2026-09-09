@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load root .env variables
-load_dotenv()
+# Load root .env variables with override=True to ensure workspace keys take precedence
+load_dotenv(override=True)
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +20,18 @@ class Settings:
     
     # LLMs Configuration
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
+    GROQ_API_KEY_2: str = os.getenv("GROQ_API_KEY_2", "")
+    OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY", "")
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+
+    @property
+    def groq_keys(self) -> list[str]:
+        keys = []
+        if self.GROQ_API_KEY:
+            keys.append(self.GROQ_API_KEY)
+        if self.GROQ_API_KEY_2 and self.GROQ_API_KEY_2 not in keys:
+            keys.append(self.GROQ_API_KEY_2)
+        return keys
     
     # File Storage Settings
     STORAGE_PROVIDER: str = os.getenv("STORAGE_PROVIDER", os.getenv("STORAGE_BACKEND", "local"))

@@ -43,21 +43,23 @@
         <div class="h-14 w-14 rounded-full border-4 border-ink bg-yellow overflow-hidden shadow-sm-brutal shrink-0"><img src="/static/docmind-logo.png" alt="DocMind logo" class="h-full w-full object-cover" /></div>
         <div>
           <h1 class="text-3xl font-black leading-none">DocMind</h1>
-          <p class="text-xs font-bold text-muted">Ask with sources</p>
+          <p class="text-xs font-bold text-muted">Cited PDF Intelligence</p>
         </div>
       </div>
-      <nav class="space-y-3">
-        <a href="/dashboard" class="flex items-center gap-3 border-4 border-transparent hover:border-ink hover:bg-soft p-3 font-black"><span class="material-symbols-outlined">library_books</span>Library</a>
-        <a id="details-link" href="/dashboard" class="flex items-center gap-3 border-4 border-transparent hover:border-ink hover:bg-soft p-3 font-black"><span class="material-symbols-outlined">info</span>Document Details</a>
-        <button id="new-chat-btn" class="w-full flex items-center gap-3 bg-yellow border-4 border-ink shadow-sm-brutal p-3 font-black text-left"><span class="material-symbols-outlined">add_box</span>New Chat</button>
+      <nav class="space-y-2">
+        <a href="/dashboard.html?tab=docs" class="flex items-center gap-3 border-4 border-transparent hover:border-ink hover:bg-soft p-2.5 font-black text-sm"><span class="material-symbols-outlined text-lg">library_books</span>Document Library</a>
+        <a href="/dashboard.html?tab=studio" class="flex items-center gap-3 border-4 border-transparent hover:border-ink hover:bg-yellow p-2.5 font-black text-sm"><span class="material-symbols-outlined text-lg text-purple">hub</span>Creator Studio</a>
+        <a href="/dashboard.html?tab=live" class="flex items-center gap-3 border-4 border-transparent hover:border-ink hover:bg-soft p-2.5 font-black text-sm"><span class="material-symbols-outlined text-lg">travel_explore</span>Live Fact-Check</a>
+        <a href="/dashboard.html?tab=guard" class="flex items-center gap-3 border-4 border-transparent hover:border-ink hover:bg-soft p-2.5 font-black text-sm"><span class="material-symbols-outlined text-lg">security</span>AgentPrahari</a>
+        <button id="new-chat-btn" class="w-full flex items-center gap-3 bg-yellow border-4 border-ink shadow-sm-brutal p-2.5 font-black text-sm text-left mt-2"><span class="material-symbols-outlined text-lg">add_box</span>New Chat</button>
       </nav>
       <div class="border-t-4 border-ink pt-4 flex-1 overflow-y-auto">
         <p class="text-xs font-black uppercase tracking-[.18em] text-muted mb-3">Recent documents</p>
         <ul id="recent-list" class="grid gap-2"></ul>
       </div>
-      <div class="border-t-4 border-ink pt-4 grid gap-3">
-        <button id="settings-btn" class="border-4 border-transparent hover:border-ink hover:bg-soft p-3 font-black text-left flex items-center gap-3"><span class="material-symbols-outlined">settings</span>Settings</button>
-        <button id="logout-btn" class="border-4 border-transparent hover:border-ink hover:bg-dangerSoft p-3 font-black text-left flex items-center gap-3"><span class="material-symbols-outlined">logout</span>Logout</button>
+      <div class="border-t-4 border-ink pt-4 grid gap-2">
+        <button id="settings-btn" class="border-2 border-ink bg-card hover:bg-soft p-2 font-black text-xs text-left flex items-center gap-2"><span class="material-symbols-outlined text-sm">settings</span>Settings</button>
+        <button id="logout-btn" class="border-2 border-ink bg-card hover:bg-dangerSoft p-2 font-black text-xs text-left flex items-center gap-2"><span class="material-symbols-outlined text-sm">logout</span>Logout</button>
       </div>
     </aside>
 
@@ -95,9 +97,12 @@
               <h2 id="current-doc-title" class="text-xl sm:text-2xl font-black truncate">Document</h2>
             </div>
           </div>
-          <div class="flex gap-2">
+          <div class="flex items-center gap-2">
+            <button id="repurpose-chat-btn" class="press hidden sm:inline-flex border-2 border-ink bg-yellow px-3 py-1.5 font-black text-xs shadow-xs items-center gap-1 hover:bg-yellowSoft" title="Send document to 4-Agent Studio">
+              <span class="material-symbols-outlined text-sm">hub</span> Repurpose in Studio
+            </button>
             <button id="mobile-pdf-tab" class="lg:hidden border-4 border-ink bg-yellow px-3 py-2 font-black">PDF</button>
-            <a href="/dashboard" class="hidden sm:inline-flex border-4 border-ink bg-card px-3 py-2 font-black hover:bg-yellow">Library</a>
+            <a href="/dashboard.html?tab=docs" class="hidden sm:inline-flex border-2 border-ink bg-card px-3 py-1.5 font-black text-xs hover:bg-yellow shadow-xs">Library</a>
           </div>
         </div>
       </header>

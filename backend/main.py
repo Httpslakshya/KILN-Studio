@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from backend.api.auth import router as auth_router
 from backend.api.documents import router as documents_router, seed_documents
 from backend.api.chat import router as chat_router
+from backend.api.live_rag import router as live_rag_router
 from backend.middleware.security import setup_cors
 from backend.utils.logging_config import logger
 
@@ -28,8 +29,8 @@ async def lifespan(app: FastAPI):
 # Initialize FastAPI App
 app = FastAPI(
     title="DocMind API",
-    description="A modular, production-ready full-stack backend serving PDF citations and LLM chat requests.",
-    version="1.0.0",
+    description="A modular, production-ready full-stack backend serving PDF citations and LLM chat requests, live verified RAG, and AgentPrahari guardrails.",
+    version="1.1.0",
     lifespan=lifespan
 )
 
@@ -40,6 +41,7 @@ setup_cors(app)
 app.include_router(auth_router)
 app.include_router(documents_router)
 app.include_router(chat_router)
+app.include_router(live_rag_router)
 
 @app.get("/health")
 def health_check():

@@ -12,7 +12,8 @@ export default defineConfig({
         dashboard: resolve(__dirname, 'dashboard.html'),
         processing: resolve(__dirname, 'processing.html'),
         chat: resolve(__dirname, 'chat.html'),
-        document: resolve(__dirname, 'document.html')
+        document: resolve(__dirname, 'document.html'),
+        live_rag: resolve(__dirname, 'live_rag.html')
       }
     }
   }
