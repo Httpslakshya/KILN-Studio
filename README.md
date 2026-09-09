@@ -6,19 +6,33 @@
   <p><strong>Forge raw documents and real-time world data into verified intelligence, cited answers, and viral multi-agent content.</strong></p>
 
   <p>
+    <a href="https://kiln-studioai.vercel.app" target="_blank"><img src="https://img.shields.io/badge/🚀%20Live%20Application-kiln--studioai.vercel.app-FF5B22?style=for-the-badge&logo=vercel&logoColor=white" alt="Live on Vercel" /></a>
     <a href="https://pypi.org/project/agentprahari/"><img src="https://img.shields.io/badge/Security-AgentPrahari%20v0.1.0-7B61FF?style=for-the-badge&logo=pypi&logoColor=white" alt="AgentPrahari on PyPI" /></a>
-    <img src="https://img.shields.io/badge/Backend-FastAPI%20%7C%20Python%203.11+-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
-    <img src="https://img.shields.io/badge/Frontend-Vite%20%7C%20Vanilla%20JS-FF5B22?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+    <img src="https://img.shields.io/badge/Backend-FastAPI%20%7C%20Render-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI on Render" />
+    <img src="https://img.shields.io/badge/Frontend-Vite%20%7C%20Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
     <img src="https://img.shields.io/badge/VectorDB-Qdrant%20Cloud-DC2626?style=for-the-badge&logo=qdrant&logoColor=white" alt="Qdrant" />
     <img src="https://img.shields.io/badge/Protocol-Anthropic%20MCP-4F46E5?style=for-the-badge" alt="MCP" />
   </p>
+
+  <p>
+    🔗 <strong>Live App:</strong> <a href="https://kiln-studioai.vercel.app" target="_blank"><strong>https://kiln-studioai.vercel.app</strong></a> &nbsp;|&nbsp;
+    ⚡ <strong>API Endpoint:</strong> <a href="https://docmind-8qsv.onrender.com" target="_blank"><strong>https://docmind-8qsv.onrender.com</strong></a> &nbsp;|&nbsp;
+    📚 <strong>Swagger Docs:</strong> <a href="https://docmind-8qsv.onrender.com/docs" target="_blank"><strong>/docs</strong></a>
+  </p>
 </div>
+
+---
+
+> 🚀 **KILN Studio is Live in Production!**  
+> Experience the autonomous 4-agent creator forge, live fact-checking, and cited PDF intelligence directly in your browser:  
+> **👉 [https://kiln-studioai.vercel.app](https://kiln-studioai.vercel.app)**
 
 ---
 
 ## 📖 Table of Contents
 
 * [Overview](#-overview)
+* [Live Deployment](#-live-deployment)
 * [Autonomous Creator Forge (Core Engine)](#-autonomous-creator-forge-core-engine)
   * [The 4-Agent Closed-Loop Pipeline](#the-4-agent-closed-loop-pipeline)
   * [5 Instant Publication Formats](#5-instant-publication-formats)
@@ -42,6 +56,21 @@
 **KILN Studio** is an autonomous intelligence and creator forge platform designed for writers, researchers, founders, and digital creators. Just as raw clay or ore is fired into durable ceramic inside a kiln, **KILN Studio** transforms raw documents (PDFs) and chaotic live web streams into high-confidence, publication-ready creator assets.
 
 Instead of writing ungrounded generic drafts with raw LLMs, KILN Studio deploys an autonomous **Supervisor-governed 4-Agent loop** that scrapes fresh sources, verifies claims across $\ge 2$ independent publisher domains, drafts cited narratives, and automatically critiques quality with self-correcting revision cycles.
+
+---
+
+## 🌐 Live Deployment
+
+KILN Studio is deployed and fully operational in production across high-performance edge and cloud infrastructure:
+
+| Component | Platform | Live URL / Endpoint | Details |
+| :--- | :--- | :--- | :--- |
+| **Frontend Web App** | **Vercel** | [**https://kiln-studioai.vercel.app**](https://kiln-studioai.vercel.app) | Vite SPA with Neobrutalist UI, responsive mobile/desktop, guest demo access |
+| **Backend API Engine** | **Render** | [**https://docmind-8qsv.onrender.com**](https://docmind-8qsv.onrender.com) | FastAPI + Uvicorn with AgentPrahari guardrails & multi-model LLM router |
+| **Interactive API Docs** | **Swagger UI** | [**https://docmind-8qsv.onrender.com/docs**](https://docmind-8qsv.onrender.com/docs) | OpenAPI interactive endpoints specification |
+| **Vector Database** | **Qdrant Cloud** | Managed AWS Cluster | Hybrid semantic retrieval with sub-50ms latency |
+
+> 💡 **Try It Instantly:** Visit [**kiln-studioai.vercel.app**](https://kiln-studioai.vercel.app) and click **"Continue as Guest"** or **"Start with demo access"** to test the 4-agent creator forge without needing any setup!
 
 ---
 
@@ -233,8 +262,8 @@ Add to your `claude_desktop_config.json`:
 ### 1. Backend Setup
 ```bash
 # Clone the repository
-git clone https://github.com/lakshya/DocMind.git
-cd DocMind
+git clone https://github.com/Httpslakshya/KILN-Studio.git
+cd KILN-Studio
 
 # Create and activate virtual environment
 python -m venv venv
