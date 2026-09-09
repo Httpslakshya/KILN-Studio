@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="DocMind Studio: Autonomous Multi-Agent Content Engine, Cited PDF Intelligence, and Live Fact-Checking protected by AgentPrahari." />
-  <title>DocMind Studio | Unified Intelligence & Creator Engine</title>
+  <meta name="description" content="KILN Studio: Autonomous Multi-Agent Content Forge, Cited PDF Intelligence, and Live Fact-Checking protected by AgentPrahari." />
+  <title>KILN Studio | Unified Intelligence & Creator Forge</title>
+  <link rel="icon" type="image/png" href="/static/kiln-logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -15,19 +16,26 @@
       theme: {
         extend: {
           colors: { 
-            ink: '#1c1b1b', 
-            paper: '#fcf9f8', 
-            card: '#ffffff', 
-            yellow: '#F5C842', 
-            yellowSoft: '#FDE8A8', 
-            purple: '#645efb', 
-            purpleDark: '#4b41e1', 
-            muted: '#4d4632', 
-            danger: '#ba1a1a', 
-            dangerSoft: '#ffdad6', 
-            success: '#00875a',
-            successSoft: '#e3fcef',
-            soft: '#f0edec' 
+            ink: '#1E1B2E',           // Deep Obsidian Forge Ink (matches logo charcoal & 'N')
+            paper: '#FDFBF7',         // Warm Hearth Stone Ivory
+            card: '#FFFFFF',          // Clean White Card Face
+            forge: '#FF5B22',         // KILN Fire Orange (from logo 'K' & hearth fire)
+            forgeSoft: '#FFF0E8',     // Warm Ember Glow Tint for banners
+            amber: '#FFA629',         // Hearth Flame Amber
+            amberSoft: '#FFF8EB',     // Warm Hearth Glow
+            violet: '#7B61FF',        // KILN Studio Violet (from logo 'L' & STUDIO bar)
+            violetDark: '#5E43F3',    // Deep Violet for buttons & active states
+            violetSoft: '#F2EFFF',    // Soft Studio Violet Tint
+            yellow: '#FF5B22',        // Mapped to KILN Forge Orange
+            yellowSoft: '#FFF0E8',    // Mapped to KILN Soft Ember
+            purple: '#7B61FF',        // Mapped to Studio Violet
+            purpleDark: '#5E43F3',
+            muted: '#524C61',         // Comfortable charcoal text
+            danger: '#E53E3E', 
+            dangerSoft: '#FFEBEB', 
+            success: '#0E9F6E',
+            successSoft: '#DEF7EC',
+            soft: '#F4EFEA'           // Hearth Stone Neutral
           },
           fontFamily: { display: ['Space Grotesk', 'sans-serif'], body: ['Space Grotesk', 'sans-serif'] }
         }
@@ -37,20 +45,20 @@
   <style>
     body { font-family: 'Space Grotesk', sans-serif; }
     ::-webkit-scrollbar { width: 12px; height: 12px; }
-    ::-webkit-scrollbar-track { background: #fcf9f8; border-left: 4px solid #1c1b1b; }
-    ::-webkit-scrollbar-thumb { background: #F5C842; border: 3px solid #1c1b1b; }
-    .shadow-brutal { box-shadow: 8px 8px 0 #1c1b1b; }
-    .shadow-sm-brutal { box-shadow: 4px 4px 0 #1c1b1b; }
-    .shadow-xs { box-shadow: 2px 2px 0 #1c1b1b; }
+    ::-webkit-scrollbar-track { background: #FDFBF7; border-left: 4px solid #1E1B2E; }
+    ::-webkit-scrollbar-thumb { background: #FF5B22; border: 3px solid #1E1B2E; }
+    .shadow-brutal { box-shadow: 8px 8px 0 #1E1B2E; }
+    .shadow-sm-brutal { box-shadow: 4px 4px 0 #1E1B2E; }
+    .shadow-xs { box-shadow: 2px 2px 0 #1E1B2E; }
     .press { transition: transform .16s ease, box-shadow .16s ease, background .16s ease; }
-    .press:hover { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 #1c1b1b; }
-    .press:active { transform: translate(4px, 4px); box-shadow: 3px 3px 0 #1c1b1b; }
+    .press:hover { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 #1E1B2E; }
+    .press:active { transform: translate(4px, 4px); box-shadow: 3px 3px 0 #1E1B2E; }
     .card-reveal { animation: reveal .28s ease both; }
     @keyframes reveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     .pulse-step { animation: pulseBorder 1.5s infinite; }
     @keyframes pulseBorder {
-      0%, 100% { border-color: #1c1b1b; }
-      50% { border-color: #645efb; box-shadow: 6px 6px 0 #F5C842; }
+      0%, 100% { border-color: #1E1B2E; }
+      50% { border-color: #FF5B22; box-shadow: 6px 6px 0 #FFA629; }
     }
     /* Collapsible Sidebar (ChatGPT Style) */
     #sidebar {
@@ -66,9 +74,18 @@
       pointer-events: none !important;
       overflow: hidden !important;
     }
+    /* Hide the header toggle button on desktop when sidebar is open to avoid duplicate buttons */
+    @media (min-width: 768px) {
+      #app-layout:not(.sidebar-collapsed) #header-sidebar-toggle {
+        display: none !important;
+      }
+      .sidebar-collapsed #header-sidebar-toggle {
+        display: grid !important;
+      }
+    }
   </style>
 </head>
-<body class="bg-paper text-ink min-h-screen overflow-x-hidden selection:bg-yellow selection:text-ink">
+<body class="bg-paper text-ink min-h-screen overflow-x-hidden selection:bg-forge selection:text-white">
   <div id="app-layout" class="min-h-screen flex w-full">
     <!-- Unified Master Navigation Sidebar -->
     <aside id="sidebar" class="fixed md:sticky top-0 left-0 z-40 h-screen w-[300px] -translate-x-full md:translate-x-0 bg-card border-r-4 border-ink p-4 flex flex-col justify-between shrink-0 overflow-y-auto">
@@ -76,16 +93,13 @@
         <!-- Logo & Branding with Collapse Button -->
         <div class="flex items-center justify-between border-b-4 border-ink pb-4">
           <div class="flex items-center gap-3 min-w-0">
-            <div class="h-12 w-12 rounded-full border-4 border-ink bg-yellow overflow-hidden shadow-sm-brutal shrink-0 flex items-center justify-center font-black text-xl">
-              <img src="/static/docmind-logo.png" alt="DocMind" class="h-full w-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-              <span style="display:none;" class="h-full w-full items-center justify-center bg-yellow font-black text-xl">DM</span>
-            </div>
+            <img src="/static/kiln-logo.png" alt="KILN Studio" class="h-11 w-auto object-contain shrink-0" />
             <div class="min-w-0">
-              <h1 class="text-xl font-black leading-none tracking-tight truncate">DocMind Studio</h1>
-              <p class="text-[9px] font-black uppercase tracking-wider text-purple mt-1 truncate">AI & Content Engine</p>
+              <h1 class="text-xl font-black leading-none tracking-tight truncate text-ink">KILN Studio</h1>
+              <p class="text-[9px] font-black uppercase tracking-wider text-violet mt-1 truncate">Intelligence & Content Forge</p>
             </div>
           </div>
-          <button id="sidebar-collapse-btn" class="hidden md:grid h-9 w-9 border-2 border-ink bg-card hover:bg-yellow place-items-center shadow-xs transition shrink-0 ml-1" title="Collapse sidebar (Ctrl+B)">
+          <button id="sidebar-collapse-btn" class="hidden md:grid h-9 w-9 border-2 border-ink bg-card hover:bg-forge hover:text-white place-items-center shadow-xs transition shrink-0 ml-1" title="Collapse sidebar (Ctrl+B)">
             <span class="material-symbols-outlined text-base">dock_to_left</span>
           </button>
         </div>
@@ -94,10 +108,10 @@
         <nav class="space-y-2">
           <div class="px-2 py-1 text-[10px] font-black uppercase text-muted tracking-wider">Unified Workspaces</div>
           
-          <button id="nav-studio-btn" class="nav-tab-btn w-full flex items-center gap-3 bg-yellowSoft border-4 border-ink shadow-sm-brutal p-3 font-black text-sm text-left transition" data-workspace="studio">
-            <span class="material-symbols-outlined text-xl">hub</span>
+          <button id="nav-studio-btn" class="nav-tab-btn w-full flex items-center gap-3 bg-forgeSoft border-4 border-ink shadow-sm-brutal p-3 font-black text-sm text-left transition" data-workspace="studio">
+            <span class="material-symbols-outlined text-xl text-forge">hub</span>
             <div class="flex-1">
-              <span class="block leading-tight">Creator Studio</span>
+              <span class="block leading-tight text-ink font-black">Creator Forge</span>
               <span class="text-[10px] font-bold text-muted block">4-Agent Autonomous Loop</span>
             </div>
           </button>
@@ -130,12 +144,12 @@
 
       <!-- AgentPrahari & Account Controls in Sidebar Footer -->
       <div class="space-y-3">
-        <div class="border-4 border-ink bg-purple/10 p-3 shadow-sm-brutal space-y-1.5">
+        <div class="border-4 border-ink bg-violet/10 p-3 shadow-sm-brutal space-y-1.5">
           <div class="flex items-center justify-between">
-            <span class="font-black text-xs flex items-center gap-1.5 text-purple">
+            <span class="font-black text-xs flex items-center gap-1.5 text-violet">
               <span class="material-symbols-outlined text-base">shield</span> AgentPrahari Active
             </span>
-            <a href="https://pypi.org/project/agentprahari/" target="_blank" class="px-1.5 py-0.5 bg-purple text-white text-[9px] font-black hover:underline">v0.1.0</a>
+            <a href="https://pypi.org/project/agentprahari/" target="_blank" class="px-1.5 py-0.5 bg-violet text-white text-[9px] font-black hover:underline">v0.1.0</a>
           </div>
           <p class="text-[11px] text-muted font-bold leading-tight">
             Enterprise guardrail on PyPI. PII, prompt-injection defense & groundedness verified.
@@ -143,8 +157,8 @@
         </div>
 
         <div class="border-t-4 border-ink pt-3 space-y-2">
-          <button id="upgrade-btn" class="press shadow-sm-brutal w-full bg-purple text-white border-4 border-ink p-2 font-black text-xs flex items-center justify-center gap-1.5">
-            <span class="material-symbols-outlined text-base">bolt</span> DocMind Pro Active
+          <button id="upgrade-btn" class="press shadow-sm-brutal w-full bg-forge text-white border-4 border-ink p-2 font-black text-xs flex items-center justify-center gap-1.5 hover:bg-forge/90">
+            <span class="material-symbols-outlined text-base">local_fire_department</span> KILN Pro Active
           </button>
           <div class="grid grid-cols-2 gap-2">
             <button id="settings-btn" class="border-2 border-ink bg-card hover:bg-soft p-2 font-black text-xs flex items-center justify-center gap-1">
@@ -164,25 +178,25 @@
       <header class="sticky top-0 z-30 bg-card/95 backdrop-blur border-b-4 border-ink px-4 sm:px-6 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <!-- Sidebar Toggle (ChatGPT Style) -->
-          <button id="header-sidebar-toggle" class="border-2 border-ink bg-card hover:bg-yellow shadow-xs h-9 w-9 grid place-items-center transition shrink-0" title="Toggle sidebar (Ctrl+B)">
+          <button id="header-sidebar-toggle" class="border-2 border-ink bg-card hover:bg-forge hover:text-white shadow-xs h-9 w-9 grid place-items-center transition shrink-0" title="Toggle sidebar (Ctrl+B)">
             <span class="material-symbols-outlined text-lg">dock_to_left</span>
           </button>
           <div class="min-w-0">
             <div class="flex items-center gap-2">
-              <span class="text-[10px] font-black uppercase tracking-wider text-purple px-1.5 py-0.5 bg-purple/10 border border-ink">One Unified Studio</span>
-              <span id="header-breadcrumb" class="text-xs font-black uppercase tracking-widest text-muted truncate">/ Creator Studio</span>
+              <span class="text-[10px] font-black uppercase tracking-wider text-violet px-1.5 py-0.5 bg-violet/10 border border-ink">The Intelligence Forge</span>
+              <span id="header-breadcrumb" class="text-xs font-black uppercase tracking-widest text-muted truncate">/ Creator Forge</span>
             </div>
             <h2 id="header-title" class="text-lg sm:text-2xl font-black leading-tight text-ink truncate">Autonomous 4-Agent Pipeline</h2>
           </div>
         </div>
 
         <div class="flex items-center gap-2 sm:gap-3">
-          <button id="header-quick-upload" class="press border-2 border-ink bg-yellow hover:bg-yellowSoft px-3 py-1.5 font-black text-xs shadow-sm-brutal flex items-center gap-1">
+          <button id="header-quick-upload" class="press border-2 border-ink bg-forge text-white hover:bg-forge/90 px-3 py-1.5 font-black text-xs shadow-sm-brutal flex items-center gap-1">
             <span class="material-symbols-outlined text-sm">upload_file</span> Quick Upload PDF
           </button>
           <div class="border-2 border-ink bg-card px-3 py-1 font-bold text-xs shadow-xs hidden sm:flex items-center gap-2">
             <span class="h-2 w-2 rounded-full bg-success animate-pulse"></span>
-            <span id="user-greeting-pill" class="font-black">Pro Workspace</span>
+            <span id="user-greeting-pill" class="font-black text-ink">KILN Pro Active</span>
           </div>
         </div>
       </header>
@@ -194,23 +208,24 @@
         <!-- WORKSPACE 1: AUTONOMOUS CREATOR STUDIO (4-Agent Closed-Loop Engine)   -->
         <!-- ====================================================================== -->
         <section id="workspace-studio" class="space-y-6">
-          <!-- Top Studio Hero Banner with Softened Yellow -->
-          <div class="border-4 border-ink bg-yellowSoft p-6 sm:p-8 shadow-brutal flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <!-- Top Studio Hero Banner with KILN Ember Palette -->
+          <div class="border-4 border-ink bg-forgeSoft p-6 sm:p-8 shadow-brutal flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
-              <div class="inline-flex items-center gap-2 px-3 py-1 bg-ink text-yellowSoft border border-ink text-xs font-black mb-2 shadow-xs uppercase tracking-wider">
-                <span class="material-symbols-outlined text-sm">bolt</span> VERIFIED AUTONOMOUS AGENT ENGINE
+              <div class="inline-flex items-center gap-2 px-3 py-1 bg-ink text-forge border border-ink text-xs font-black mb-2 shadow-xs uppercase tracking-wider">
+                <span class="material-symbols-outlined text-sm">local_fire_department</span> KILN INTELLIGENCE FORGE
               </div>
-              <h2 class="text-3xl sm:text-4xl font-black tracking-tight text-ink">Autonomous Content Creator Studio</h2>
+              <h2 class="text-3xl sm:text-4xl font-black tracking-tight text-ink">Autonomous Content & Intelligence Forge</h2>
               <p class="text-xs sm:text-sm font-bold text-ink/80 mt-1 max-w-2xl leading-relaxed">
-                Researcher &rarr; Verifier &rarr; Writer &rarr; Editor loop. Scrapes live intelligence, verifies claims across &ge;2 independent domains, checks safety with AgentPrahari, and synthesizes 1-click creator assets.
+                Transform raw web & document intelligence into fire-tested, publication-ready assets. 
+                Researcher &rarr; Verifier &rarr; Writer &rarr; Editor closed-loop consensus with AgentPrahari safety.
               </p>
             </div>
             <div class="flex flex-wrap items-center gap-3 shrink-0">
-              <div class="border-2 border-ink bg-card px-3 py-2 text-center shadow-xs">
+              <div class="border-2 border-ink bg-card px-3.5 py-2 text-center shadow-xs">
                 <span class="block text-[10px] font-black uppercase text-muted">Architecture</span>
-                <span class="text-xs font-black text-purple">4-Agent Closed Loop</span>
+                <span class="text-xs font-black text-violet">4-Agent Consensus Forge</span>
               </div>
-              <button id="studio-switch-to-docs" class="press border-4 border-ink bg-card px-4 py-2 font-black text-xs shadow-sm-brutal flex items-center gap-1.5 hover:bg-yellowSoft">
+              <button id="studio-switch-to-docs" class="press border-4 border-ink bg-card px-4 py-2 font-black text-xs shadow-sm-brutal flex items-center gap-1.5 hover:bg-forgeSoft">
                 <span class="material-symbols-outlined text-sm">library_books</span> PDF Knowledge Base
               </button>
             </div>
@@ -228,7 +243,7 @@
                   Launch the 4-agent consensus loop. Enforce strict citations and cross-domain verification.
                 </p>
               </div>
-              <span class="px-3 py-1 bg-yellow border-2 border-ink text-xs font-black shadow-xs self-start sm:self-auto">Supervisor Closed Loop</span>
+              <span class="px-3 py-1 bg-forge text-white border-2 border-ink text-xs font-black shadow-xs self-start sm:self-auto">Supervisor Closed Loop</span>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -378,7 +393,7 @@
             <!-- Editor Score Card with Heavy 4px Border and Roomy Stat Boxes -->
             <div class="border-4 border-ink bg-card p-6 shadow-brutal flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div class="space-y-1">
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow border-2 border-ink text-[11px] font-black uppercase tracking-wider shadow-xs">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-forge text-white border-2 border-ink text-[11px] font-black uppercase tracking-wider shadow-xs">
                   <span class="material-symbols-outlined text-xs">verified</span> EDITORIAL SCORECARD
                 </div>
                 <h4 class="text-2xl font-black mt-2 text-ink inline-flex items-center gap-2 cursor-help group" id="scorecard-summary" title="Scored by Editor Critic: 40% Groundedness & Source Citations, 30% Multi-Domain Corroboration, 30% Narrative Clarity & Structure">
@@ -406,13 +421,13 @@
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
                   <div>
                     <div class="flex items-center gap-2">
-                      <span class="px-2.5 py-0.5 bg-yellow border-2 border-ink text-xs font-black uppercase tracking-wider">CREATOR STUDIO</span>
+                      <span class="px-2.5 py-0.5 bg-forge text-white border-2 border-ink text-xs font-black uppercase tracking-wider">CREATOR STUDIO</span>
                       <h4 class="text-xl font-black text-ink">Multi-Format Creator Workspace</h4>
                     </div>
                     <p class="text-xs font-bold text-muted mt-0.5">Switch instantly between publication-ready creator formats:</p>
                   </div>
                   <div class="flex items-center gap-2">
-                    <button id="studio-dock-copy-btn" class="press border-2 border-ink bg-yellow px-4 py-2 text-xs font-black shadow-sm-brutal flex items-center gap-1.5">
+                    <button id="studio-dock-copy-btn" class="press border-2 border-ink bg-forge text-white hover:bg-forge/90 px-4 py-2 text-xs font-black shadow-sm-brutal flex items-center gap-1.5">
                       <span class="material-symbols-outlined text-sm">content_copy</span> Copy Active Asset
                     </button>
                   </div>
@@ -459,17 +474,17 @@
           <div class="grid xl:grid-cols-[1fr_360px] gap-6 items-start">
             <div>
               <!-- Greeting Banner -->
-              <div class="mb-6 bg-yellow border-4 border-ink shadow-brutal p-5 sm:p-7">
-                <p class="text-xs font-black uppercase tracking-[.18em] text-muted">Good to see you</p>
-                <h1 id="user-greeting" class="text-4xl sm:text-5xl font-black tracking-tight">Good Morning, Guest</h1>
+              <div class="mb-6 bg-forgeSoft border-4 border-ink shadow-brutal p-5 sm:p-7">
+                <span class="inline-block px-2.5 py-0.5 bg-forge text-white border border-ink text-xs font-black uppercase tracking-wider mb-2">Document Knowledge Base</span>
+                <h1 id="user-greeting" class="text-4xl sm:text-5xl font-black tracking-tight text-ink">Good Morning, Guest</h1>
                 <p class="mt-2 max-w-2xl font-semibold text-muted">Ready to extract cited knowledge from your documents? Drop a PDF below or pick up where you left off.</p>
               </div>
 
               <!-- PDF Upload Drop Zone -->
               <section id="upload-card" class="mb-7 relative group">
                 <div class="absolute inset-0 translate-x-2 translate-y-2 bg-ink"></div>
-                <div id="drop-zone" class="relative bg-card border-4 border-dashed border-ink p-6 sm:p-8 min-h-[190px] flex flex-col items-center justify-center text-center transition group-hover:bg-yellowSoft cursor-pointer">
-                  <div class="h-20 w-20 rounded-full border-4 border-ink bg-yellow grid place-items-center shadow-sm-brutal mb-4 transition group-hover:scale-105">
+                <div id="drop-zone" class="relative bg-card border-4 border-dashed border-ink p-6 sm:p-8 min-h-[190px] flex flex-col items-center justify-center text-center transition group-hover:bg-forgeSoft cursor-pointer">
+                  <div class="h-20 w-20 rounded-full border-4 border-ink bg-forge text-white grid place-items-center shadow-sm-brutal mb-4 transition group-hover:scale-105">
                     <span class="material-symbols-outlined text-4xl">upload_file</span>
                   </div>
                   <h3 class="text-2xl sm:text-3xl font-black">Drop your PDF here</h3>
@@ -540,21 +555,21 @@
                 class="flex-1 border-4 border-ink p-3 font-bold text-base focus:outline-none focus:ring-2 focus:ring-yellow shadow-sm-brutal bg-paper"
                 value="Artificial Intelligence regulatory developments"
               />
-              <button id="live-search-btn" class="press border-4 border-ink bg-yellow px-6 py-3 font-black text-base shadow-brutal flex items-center justify-center gap-2 shrink-0">
+              <button id="live-search-btn" class="press border-4 border-ink bg-forge text-white hover:bg-forge/90 px-6 py-3 font-black text-base shadow-brutal flex items-center justify-center gap-2 shrink-0">
                 <span class="material-symbols-outlined">search</span> Verify & Generate
               </button>
             </div>
             <!-- Quick Chips -->
             <div class="flex flex-wrap items-center gap-2 pt-2">
               <span class="text-xs font-black text-muted uppercase">Quick Scenarios:</span>
-              <button class="quick-query-chip border-2 border-ink bg-soft px-2.5 py-1 text-xs font-bold hover:bg-yellow">Quantum Computing breakthroughs</button>
-              <button class="quick-query-chip border-2 border-ink bg-soft px-2.5 py-1 text-xs font-bold hover:bg-yellow">NVIDIA AI chip developments</button>
-              <button class="quick-query-chip border-2 border-ink bg-soft px-2.5 py-1 text-xs font-bold hover:bg-yellow">Global Renewable Energy capacity 2025</button>
+              <button class="quick-query-chip border-2 border-ink bg-soft px-2.5 py-1 text-xs font-bold hover:bg-forge hover:text-white">Quantum Computing breakthroughs</button>
+              <button class="quick-query-chip border-2 border-ink bg-soft px-2.5 py-1 text-xs font-bold hover:bg-forge hover:text-white">NVIDIA AI chip developments</button>
+              <button class="quick-query-chip border-2 border-ink bg-soft px-2.5 py-1 text-xs font-bold hover:bg-forge hover:text-white">Global Renewable Energy capacity 2025</button>
             </div>
           </div>
 
           <!-- Loading State -->
-          <div id="live-rag-loading" class="hidden border-4 border-ink bg-yellowSoft/40 p-8 text-center shadow-brutal space-y-3">
+          <div id="live-rag-loading" class="hidden border-4 border-ink bg-forgeSoft p-8 text-center shadow-brutal space-y-3">
             <div class="inline-block animate-spin h-10 w-10 border-4 border-ink border-t-transparent rounded-full"></div>
             <p class="text-base font-black">Ingesting live RSS streams, applying time-decay scoring, and verifying claims...</p>
           </div>
@@ -599,7 +614,7 @@
                   <span class="material-symbols-outlined text-purple">article</span>
                   Grounded Intelligence Synthesis
                 </h4>
-                <span class="px-3 py-1 bg-yellow border-2 border-ink text-xs font-black self-start sm:self-auto">Strict Citation Mode</span>
+                <span class="px-3 py-1 bg-forge text-white border-2 border-ink text-xs font-black self-start sm:self-auto">Strict Citation Mode</span>
               </div>
 
               <!-- Live RAG Quick Repurpose Action Bar -->
@@ -746,7 +761,7 @@
         <button id="modal-close" class="font-black text-2xl leading-none">&times;</button>
       </div>
       <div id="modal-body" class="font-semibold text-muted space-y-3">
-        <p>DocMind Studio v1.2.0 (Unified Architecture)</p>
+        <p>KILN Studio v1.2.0 (Unified Intelligence & Creator Forge)</p>
         <p class="text-xs">Security: AgentPrahari guardrails enabled on all agent input & output streams.</p>
         <p class="text-xs">LLM Engine: Prioritizing Groq Qwen 2.5 32B with fallback to Gemini 2.5 Flash and OpenRouter Llama 3.3 70B.</p>
       </div>

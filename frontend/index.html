@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="DocMind turns PDFs into cited answers, notes, quizzes, and study guides." />
-  <title>DocMind | Login</title>
+  <meta name="description" content="KILN Studio - The unified intelligence and creator engine for verified document synthesis and cross-domain content creation." />
+  <title>KILN Studio | Login</title>
+  <link rel="icon" type="image/png" href="/static/kiln-logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -15,17 +16,23 @@
       theme: {
         extend: {
           colors: {
-            ink: '#1c1b1b',
-            paper: '#fcf9f8',
-            card: '#ffffff',
-            yellow: '#ffd60a',
-            yellowSoft: '#ffe171',
-            purple: '#645efb',
-            purpleDark: '#4b41e1',
-            muted: '#4d4632',
-            line: '#1c1b1b',
-            danger: '#ba1a1a',
-            dangerSoft: '#ffdad6'
+            ink: '#1E1B2E',
+            paper: '#FDFBF7',
+            card: '#FFFFFF',
+            forge: '#FF5B22',
+            forgeSoft: '#FFF0E8',
+            amber: '#FFA629',
+            amberSoft: '#FFF8EB',
+            violet: '#7B61FF',
+            violetDark: '#5E43F3',
+            yellow: '#FF5B22',
+            yellowSoft: '#FFF0E8',
+            purple: '#7B61FF',
+            purpleDark: '#5E43F3',
+            muted: '#4A4656',
+            line: '#1E1B2E',
+            danger: '#BA1A1A',
+            dangerSoft: '#FFDAD6'
           },
           fontFamily: { display: ['Space Grotesk', 'sans-serif'], body: ['Space Grotesk', 'sans-serif'] }
         }
@@ -35,50 +42,46 @@
   <style>
     * { box-sizing: border-box; }
     body { font-family: 'Space Grotesk', sans-serif; }
-    .shadow-brutal { box-shadow: 8px 8px 0 #1c1b1b; }
-    .shadow-brutal-lg { box-shadow: 14px 14px 0 #1c1b1b; }
+    .shadow-brutal { box-shadow: 8px 8px 0 #1E1B2E; }
+    .shadow-brutal-lg { box-shadow: 14px 14px 0 #1E1B2E; }
     .press { transition: transform .16s ease, box-shadow .16s ease, background .16s ease; }
-    .press:hover { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 #1c1b1b; }
-    .press:active { transform: translate(5px, 5px); box-shadow: 3px 3px 0 #1c1b1b; }
-    .field:focus { outline: none; background: #fff8b7; box-shadow: 6px 6px 0 #1c1b1b; transform: translate(-2px, -2px); }
+    .press:hover { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 #1E1B2E; }
+    .press:active { transform: translate(5px, 5px); box-shadow: 3px 3px 0 #1E1B2E; }
+    .field:focus { outline: none; background: #FFF0E8; box-shadow: 6px 6px 0 #1E1B2E; transform: translate(-2px, -2px); }
     @keyframes pop { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .pop { animation: pop .35s ease both; }
   </style>
 </head>
-<body class="min-h-screen bg-paper text-ink selection:bg-yellow selection:text-ink">
+<body class="min-h-screen bg-paper text-ink selection:bg-forge selection:text-white">
   <main class="min-h-screen grid lg:grid-cols-[1.05fr_.95fr]">
-    <section class="hidden lg:flex relative overflow-hidden bg-yellow border-r-4 border-line p-12 items-center justify-center">
-      <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#1c1b1b 2px, transparent 2px); background-size: 30px 30px;"></div>
-      <div class="absolute top-10 left-10 h-20 w-20 rounded-full bg-purple border-4 border-line shadow-brutal"></div>
+    <section class="hidden lg:flex relative overflow-hidden bg-gradient-to-br from-forgeSoft via-amberSoft to-paper border-r-4 border-line p-12 items-center justify-center">
+      <div class="absolute inset-0 opacity-15" style="background-image: radial-gradient(#1E1B2E 2px, transparent 2px); background-size: 30px 30px;"></div>
+      <div class="absolute top-10 left-10 h-20 w-20 rounded-full bg-violet border-4 border-line shadow-brutal"></div>
       <div class="absolute bottom-12 right-16 h-28 w-28 bg-card border-4 border-line shadow-brutal rotate-6"></div>
       <div class="relative z-10 max-w-xl pop">
         <div class="mb-8 inline-flex items-center gap-4 bg-card border-4 border-line shadow-brutal px-5 py-4">
-          <div class="h-16 w-16 rounded-full border-4 border-line bg-yellow overflow-hidden shadow-[4px_4px_0_#1c1b1b]">
-            <img src="/static/docmind-logo.png" alt="DocMind logo" class="h-full w-full object-cover" />
-          </div>
+          <img src="/static/kiln-logo.png" alt="KILN Studio logo" class="h-16 w-auto object-contain shrink-0" />
           <div>
-            <p class="text-sm font-black uppercase tracking-[.18em] text-muted">Meet</p>
-            <h1 class="text-4xl font-black leading-none">DocMind</h1>
+            <p class="text-xs font-black uppercase tracking-[.22em] text-forge">Welcome To</p>
+            <h1 class="text-4xl font-black leading-none tracking-tight">KILN Studio</h1>
           </div>
         </div>
-        <h2 class="text-5xl xl:text-6xl font-black leading-[.98] tracking-tight">Chat with PDFs and land on the exact page.</h2>
-        <p class="mt-6 text-xl font-semibold text-muted max-w-lg">A handcrafted document workspace for cited answers, notes, quizzes, and study guides.</p>
+        <h2 class="text-5xl xl:text-6xl font-black leading-[.98] tracking-tight">Forge raw documents into verified intelligence.</h2>
+        <p class="mt-6 text-xl font-semibold text-muted max-w-lg">A handcrafted autonomous engine for cited answers, multi-agent content pipelines, and viral thought leadership.</p>
       </div>
     </section>
 
     <section class="flex items-center justify-center p-5 sm:p-8">
       <div class="w-full max-w-md pop">
         <div class="lg:hidden mb-8 flex items-center gap-3">
-          <div class="h-12 w-12 rounded-full border-4 border-line bg-yellow overflow-hidden shadow-[4px_4px_0_#1c1b1b]">
-            <img src="/static/docmind-logo.png" alt="DocMind logo" class="h-full w-full object-cover" />
-          </div>
-          <strong class="text-3xl font-black">DocMind</strong>
+          <img src="/static/kiln-logo.png" alt="KILN Studio logo" class="h-12 w-auto object-contain shrink-0" />
+          <strong class="text-3xl font-black tracking-tight">KILN Studio</strong>
         </div>
 
         <div class="bg-card border-4 border-line shadow-brutal-lg p-6 sm:p-8">
-          <p class="inline-block bg-yellow border-4 border-line px-3 py-1 text-xs font-black uppercase tracking-[.16em]">Demo Access</p>
+          <p class="inline-block bg-forgeSoft text-forge border-2 border-line px-3 py-1 text-xs font-black uppercase tracking-[.16em]">Intelligence Forge</p>
           <h2 class="mt-5 text-4xl font-black tracking-tight">Welcome back</h2>
-          <p class="mt-2 text-muted font-semibold">Use any email and password to enter your workspace.</p>
+          <p class="mt-2 text-muted font-semibold">Enter your workspace to start forging content and querying documents.</p>
 
           <form id="login-form" class="mt-7 space-y-4" novalidate>
             <div>
@@ -91,13 +94,13 @@
             </div>
             <div class="flex items-center justify-between gap-3 text-sm font-bold">
               <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" class="rounded-none border-4 border-line text-purple focus:ring-0" />
+                <input type="checkbox" class="rounded-none border-4 border-line text-violet focus:ring-0" />
                 Remember me
               </label>
-              <button type="button" id="forgot-btn" class="text-purple hover:underline underline-offset-4 font-black">Forgot password?</button>
+              <button type="button" id="forgot-btn" class="text-violet hover:underline underline-offset-4 font-black">Forgot password?</button>
             </div>
-            <button id="signin-btn" type="submit" class="press shadow-brutal w-full bg-purple text-white border-4 border-line p-4 font-black uppercase text-lg flex items-center justify-center gap-2">
-              <span>Sign In</span>
+            <button id="signin-btn" type="submit" class="press shadow-brutal w-full bg-forge text-white border-4 border-line p-4 font-black uppercase text-lg flex items-center justify-center gap-2 hover:bg-forge/90">
+              <span>Enter Forge</span>
               <span class="material-symbols-outlined">arrow_forward</span>
             </button>
           </form>
@@ -108,11 +111,11 @@
             <div class="h-1 flex-1 bg-ink"></div>
           </div>
 
-          <button id="google-login-btn" type="button" class="press shadow-brutal w-full bg-card border-4 border-line p-4 font-black uppercase text-lg flex items-center justify-center gap-3">
-            <span class="material-symbols-outlined text-purple">account_circle</span>
+          <button id="google-login-btn" type="button" class="press shadow-brutal w-full bg-card border-4 border-line p-4 font-black uppercase text-lg flex items-center justify-center gap-3 hover:bg-forgeSoft">
+            <span class="material-symbols-outlined text-forge">local_fire_department</span>
             Continue as Guest
           </button>
-          <p class="mt-6 text-center text-muted font-semibold">No account? <button id="signup-btn" class="font-black text-purple hover:underline underline-offset-4">Start with demo access</button></p>
+          <p class="mt-6 text-center text-muted font-semibold">Instant access? <button id="signup-btn" class="font-black text-violet hover:underline underline-offset-4">Start with demo access</button></p>
           <p id="login-status" class="mt-4 hidden border-4 border-line bg-dangerSoft p-3 font-bold text-danger"></p>
         </div>
       </div>

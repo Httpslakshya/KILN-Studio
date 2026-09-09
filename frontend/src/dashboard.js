@@ -111,7 +111,7 @@ function switchWorkspace(workspaceKey, updateUrl = true) {
     if (key === workspaceKey) {
       item.section.classList.remove('hidden');
       if (item.navBtn) {
-        item.navBtn.className = 'nav-tab-btn w-full flex items-center gap-3 bg-yellow border-4 border-ink shadow-sm-brutal p-3 font-black text-sm text-left transition';
+        item.navBtn.className = 'nav-tab-btn w-full flex items-center gap-3 bg-forgeSoft border-4 border-ink shadow-sm-brutal p-3 font-black text-sm text-left transition';
       }
       // Update sticky header
       document.getElementById('header-title').textContent = item.title;
@@ -165,7 +165,7 @@ function bindSidebarAndNavigation() {
   function updateSidebarToggleIcon(collapsed) {
     const iconSpan = headerToggleBtn?.querySelector('.material-symbols-outlined');
     if (iconSpan) {
-      iconSpan.textContent = collapsed ? 'menu_open' : 'dock_to_left';
+      iconSpan.textContent = collapsed ? 'dock_to_right' : 'dock_to_left';
     }
     if (headerToggleBtn) {
       headerToggleBtn.title = collapsed ? 'Open sidebar (Ctrl+B)' : 'Collapse sidebar (Ctrl+B)';
@@ -687,7 +687,7 @@ function bindDocumentLibrary() {
   document.querySelectorAll('.quick-action').forEach(button => {
     button.addEventListener('click', () => {
       if (!state.docs.length) {
-        showToast('Upload a PDF first, then DocMind can run that action.');
+        showToast('Upload a PDF first, then KILN Studio can run that action.');
         fileInput?.click();
         return;
       }
@@ -858,7 +858,7 @@ function cardTemplate(doc, index) {
     <div class="card-reveal bg-card border-4 border-ink shadow-brutal p-5 flex flex-col justify-between" style="animation-delay: ${index * 40}ms">
       <div>
         <div class="flex items-center justify-between gap-3 border-b-2 border-ink pb-3 mb-3">
-          <div class="h-10 w-10 rounded-full border-2 border-ink bg-yellow flex items-center justify-center font-black">
+          <div class="h-10 w-10 rounded-full border-2 border-ink bg-forge text-white flex items-center justify-center font-black shadow-xs">
             <span class="material-symbols-outlined text-xl">description</span>
           </div>
           <button class="delete-doc-btn text-muted hover:text-danger p-1" data-filename="${escapeHtml(doc.filename)}" title="Delete document">
@@ -869,12 +869,12 @@ function cardTemplate(doc, index) {
         <div class="mt-3 flex flex-wrap gap-2 text-xs font-bold text-muted">
           <span class="bg-soft px-2 py-0.5 border border-ink">${escapeHtml(formattedDate)}</span>
           <span class="bg-soft px-2 py-0.5 border border-ink">${escapeHtml(sizeMb)}</span>
-          <span class="bg-yellowSoft px-2 py-0.5 border border-ink text-ink font-black">${doc.chunk_count || 0} chunks</span>
+          <span class="bg-forgeSoft px-2 py-0.5 border border-ink text-forge font-black">${doc.chunk_count || 0} chunks</span>
         </div>
       </div>
 
       <div class="mt-5 pt-3 border-t-2 border-dashed border-ink flex flex-col sm:flex-row gap-2">
-        <button class="open-chat-btn press flex-1 border-2 border-ink bg-yellow hover:bg-yellowSoft p-2 font-black text-xs text-center shadow-xs flex items-center justify-center gap-1" data-filename="${escapeHtml(doc.filename)}">
+        <button class="open-chat-btn press flex-1 border-2 border-ink bg-forge text-white hover:bg-forge/90 p-2 font-black text-xs text-center shadow-xs flex items-center justify-center gap-1" data-filename="${escapeHtml(doc.filename)}">
           <span class="material-symbols-outlined text-sm">chat</span> Chat with PDF
         </button>
         <button class="send-to-studio-btn press flex-1 border-2 border-ink bg-card hover:bg-purple hover:text-white p-2 font-black text-xs text-center shadow-xs flex items-center justify-center gap-1" data-filename="${escapeHtml(doc.filename)}">
@@ -888,7 +888,7 @@ function cardTemplate(doc, index) {
 function emptyState() {
   return `
     <div class="col-span-full border-4 border-dashed border-ink bg-card p-8 text-center shadow-brutal space-y-3">
-      <div class="h-16 w-16 mx-auto rounded-full border-4 border-ink bg-yellow grid place-items-center">
+      <div class="h-16 w-16 mx-auto rounded-full border-4 border-ink bg-forge text-white grid place-items-center">
         <span class="material-symbols-outlined text-3xl">folder_open</span>
       </div>
       <h3 class="text-2xl font-black">No Documents Yet</h3>
@@ -1163,9 +1163,10 @@ function bindSharedModals() {
 
   modalClose?.addEventListener('click', () => modal?.classList.add('hidden'));
   settingsBtn?.addEventListener('click', () => modal?.classList.remove('hidden'));
-  upgradeBtn?.addEventListener('click', () => showToast('DocMind Pro features are fully unlocked in this workspace!'));
+  upgradeBtn?.addEventListener('click', () => showToast('KILN Studio Pro features are fully unlocked in this workspace!'));
   logoutBtn?.addEventListener('click', () => {
     localStorage.removeItem('docmind_session');
+    localStorage.removeItem('kiln_session');
     window.location.href = '/index.html';
   });
 
@@ -1306,8 +1307,8 @@ function renderLinkedInPost(text) {
           IN
         </div>
         <div>
-          <span class="font-black text-sm text-ink block">DocMind Verified Creator</span>
-          <span class="text-[10px] font-bold text-muted block">Cross-Domain Verified Intelligence • 250k+ Creator Network</span>
+          <span class="font-black text-sm text-ink block">KILN Studio Verified Creator</span>
+          <span class="text-[10px] font-bold text-muted block">Cross-Domain Verified Intelligence • KILN Forge Network</span>
         </div>
       </div>
       <span class="px-2 py-0.5 bg-[#0077b5]/10 text-[#0077b5] border border-[#0077b5] text-[10px] font-black uppercase">

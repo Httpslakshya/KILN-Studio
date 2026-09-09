@@ -29,7 +29,7 @@ async function init() {
     window.location.href = '/dashboard';
     return;
   }
-  document.title = `DocMind | ${currentPdf}`;
+  document.title = `KILN Studio | ${currentPdf}`;
   document.getElementById('current-doc-title').textContent = currentPdf;
   document.getElementById('pdf-title').textContent = currentPdf;
   document.getElementById('details-link').href = `/document?pdf=${encodeURIComponent(currentPdf)}`;
@@ -120,7 +120,7 @@ async function loadRecent() {
 }
 
 function appendSystemIntro() {
-  appendAiMessage('I have this PDF ready. Ask a question or pick a quick action below. Every answer will include clickable source pages when DocMind finds supporting chunks.', []);
+  appendAiMessage('I have this PDF ready in the forge. Ask a question or pick a quick action below. Every answer will include clickable source pages when KILN Studio finds supporting chunks.', []);
 }
 
 function loadPdf() {
@@ -228,19 +228,19 @@ function appendAiMessage(text, sources) {
     <div class="mt-4 pt-3 border-t-4 border-ink">
       <p class="font-black mb-2">Sources:</p>
       <div class="flex flex-wrap gap-2">
-        ${sources.map(src => `<button data-source-page="${Number(src)}" onclick="window.goToPage(${Number(src)}, true)" class="border-4 border-ink bg-card px-3 py-2 text-sm font-black hover:bg-yellow transition">Page ${escapeHtml(src)}</button>`).join('')}
+        ${sources.map(src => `<button data-source-page="${Number(src)}" onclick="window.goToPage(${Number(src)}, true)" class="border-4 border-ink bg-card px-3 py-2 text-sm font-black hover:bg-forge hover:text-white transition">Page ${escapeHtml(src)}</button>`).join('')}
       </div>
     </div>` : '';
   row.innerHTML = `
     <div class="h-10 w-10 rounded-full border-4 border-ink bg-purple text-white grid place-items-center shadow-sm-brutal shrink-0"><span class="material-symbols-outlined">smart_toy</span></div>
     <div>
-      <div class="text-xs font-black uppercase tracking-[.14em] text-muted">DocMind | ${timeNow()}</div>
+      <div class="text-xs font-black uppercase tracking-[.14em] text-muted">KILN Studio | ${timeNow()}</div>
       <div class="mt-1 bg-card border-4 border-ink shadow-brutal p-4 font-semibold leading-relaxed">
         <div class="whitespace-pre-wrap">${formatMessage(text)}</div>
         ${sourceHtml}
         <div class="mt-3 flex gap-2">
-          <button onclick="window.copyMessage(this)" class="border-4 border-ink bg-soft px-2 py-1 text-xs font-black hover:bg-yellow">Copy</button>
-          <button onclick="window.speakMessage(this)" class="border-4 border-ink bg-soft px-2 py-1 text-xs font-black hover:bg-yellow">Read</button>
+          <button onclick="window.copyMessage(this)" class="border-4 border-ink bg-soft px-2 py-1 text-xs font-black hover:bg-forge hover:text-white">Copy</button>
+          <button onclick="window.speakMessage(this)" class="border-4 border-ink bg-soft px-2 py-1 text-xs font-black hover:bg-forge hover:text-white">Read</button>
         </div>
       </div>
     </div>`;

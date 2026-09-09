@@ -20,7 +20,7 @@ async function loadDetails() {
   try {
     const res = await apiFetch(`/api/document/meta/${encodeURIComponent(currentPdf)}`);
     docMeta = res.data;
-    document.title = `DocMind | ${docMeta.filename}`;
+    document.title = `KILN Studio | ${docMeta.filename}`;
     content.innerHTML = renderDetails(docMeta);
   } catch (err) {
     content.innerHTML = `
@@ -35,14 +35,14 @@ async function loadDetails() {
 function renderDetails(doc) {
   const safe = encodeURIComponent(doc.filename);
   return `
-    <section class="bg-yellow border-4 border-ink shadow-brutal p-5 sm:p-8">
-      <p class="text-xs font-black uppercase tracking-[.18em] text-muted">Document details</p>
-      <div class="mt-3 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
+    <section class="bg-forgeSoft border-4 border-ink shadow-brutal p-5 sm:p-8">
+      <span class="inline-block px-2.5 py-0.5 bg-forge text-white border border-ink text-xs font-black uppercase tracking-wider mb-2">Document Details</span>
+      <div class="mt-1 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
         <div class="min-w-0">
-          <h1 class="text-4xl sm:text-5xl font-black tracking-tight break-words">${escapeHtml(doc.filename)}</h1>
+          <h1 class="text-4xl sm:text-5xl font-black tracking-tight break-words text-ink">${escapeHtml(doc.filename)}</h1>
           <p class="mt-2 text-lg font-semibold text-muted">${doc.indexed ? 'Indexed and ready for cited chat.' : 'Still needs indexing before chat is reliable.'}</p>
         </div>
-        <a href="/chat?pdf=${safe}" class="press shadow-brutal bg-purple text-white border-4 border-ink px-5 py-4 font-black text-center">Open Chat</a>
+        <a href="/chat?pdf=${safe}" class="press shadow-brutal bg-forge text-white border-4 border-ink px-5 py-4 font-black text-center hover:bg-forge/90">Open Chat</a>
       </div>
     </section>
 
@@ -68,7 +68,7 @@ function renderDetails(doc) {
 
       <aside class="bg-card border-4 border-ink shadow-brutal p-6 h-fit">
         <p class="text-xs font-black uppercase tracking-[.18em] text-muted">Quick actions</p>
-        <h2 class="text-3xl font-black mt-1">Run with DocMind</h2>
+        <h2 class="text-3xl font-black mt-1">Run with KILN Studio</h2>
         <div class="mt-5 grid gap-3">
           ${actionButton('Generate Notes')}
           ${actionButton('Generate Quiz')}
@@ -91,7 +91,7 @@ function statCard(label, value, icon) {
 }
 
 function actionButton(action) {
-  return `<button onclick="window.runAction('${action}')" class="border-4 border-ink bg-yellow px-4 py-3 font-black text-left hover:bg-yellowSoft transition flex items-center justify-between">${action} <span class="material-symbols-outlined">arrow_forward</span></button>`;
+  return `<button onclick="window.runAction('${action}')" class="border-4 border-ink bg-forge text-white px-4 py-3 font-black text-left hover:bg-forge/90 transition flex items-center justify-between shadow-xs">${action} <span class="material-symbols-outlined">arrow_forward</span></button>`;
 }
 
 function runAction(action) {
@@ -99,7 +99,7 @@ function runAction(action) {
 }
 
 async function deleteDocument() {
-  if (!confirm(`Delete "${currentPdf}" from DocMind?`)) return;
+  if (!confirm(`Delete "${currentPdf}" from KILN Studio?`)) return;
   try {
     await apiFetch(`/api/document/${encodeURIComponent(currentPdf)}`, { method: 'DELETE' });
     window.location.href = '/dashboard';
