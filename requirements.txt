@@ -10,3 +10,6 @@ langchain-text-splitters
 langchain-qdrant
 langchain-google-genai
 qdrant-client
+google-generativeai
+supabase
+agentprahari

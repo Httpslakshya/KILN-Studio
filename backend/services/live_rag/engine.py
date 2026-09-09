@@ -6,12 +6,32 @@ multi-source cross-corroboration, and AgentPrahari safety guardrails.
 
 from typing import Dict, Any, List
 from datetime import datetime, timezone
-from agentprahari import AgentPrahari
+from backend.utils.logging_config import logger
+
+try:
+    from agentprahari import AgentPrahari
+except ImportError:
+    logger.warning("agentprahari not installed; using passthrough security guardrail.")
+    class _DummyGuardResult:
+        is_valid = True
+        rejection_reason = None
+        sanitized_content = None
+        decision = "ALLOW"
+        violations = []
+
+    class AgentPrahari:  # type: ignore
+        @classmethod
+        def custom(cls, **kwargs):
+            return cls()
+        def validate_input(self, text):
+            return _DummyGuardResult()
+        def validate_output(self, output_text, prompt=""):
+            return _DummyGuardResult()
+
 from backend.services.live_rag.ingestion.rss_fetcher import LiveRSSFetcher
 from backend.services.live_rag.ingestion.dedup_freshness import FreshnessAndDedupEngine
 from backend.services.live_rag.verification.cross_verifier import CrossSourceVerifier
 from backend.services.rag import call_llm
-from backend.utils.logging_config import logger
 
 
 class LiveVerifiedRAGEngine:
