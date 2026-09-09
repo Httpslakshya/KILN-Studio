@@ -12,7 +12,7 @@ class Settings:
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     
     # CORS Origin
-    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", os.getenv("FRONTEND_URLapp", "http://localhost:5173")).rstrip("/")
     
     # Vector Database
     QDRANT_URL: str = os.getenv("QDRANT_URL", "")
