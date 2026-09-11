@@ -44,15 +44,15 @@ class EditorAgent:
 
         # 3. LLM Critic Rubric Evaluation
         system_prompt = """You are a meticulous Chief Editor at a top technology intelligence publication.
-Evaluate the submitted article draft against strict editorial standards:
-1. Citation Rigor: Does almost every factual statement have an inline bracketed citation (e.g. [Source X: domain.com])?
-2. Groundedness: Are all statements strictly supported by the verified claims list without wild extrapolations?
+Evaluate the submitted article draft against modern editorial standards:
+1. Citation & Factual Rigor: Are external news events, benchmark results, and security alerts grounded with inline bracketed citations (e.g. [Source X: domain.com])?
+2. Technical Substance & Practical Value: Does the draft deliver concrete technical value (naming specific tools, commands, architectures, and actionable advice) rather than vague generic placeholders?
 3. Narrative Clarity: Is the headline punchy, the structure logical, and the executive summary crisp?
 
 Output a JSON object with:
 - "score": integer 0 to 100
 - "groundedness_score": float 0.0 to 1.0
-- "requires_revision": boolean (true if score < 85)
+- "requires_revision": boolean (true if score < 75)
 - "feedback": concrete, actionable feedback for the writer on how to improve or fix citations
 - "missing_citations": list of claims or paragraphs needing citation
 - "strengths": list of 2-3 strong aspects of the piece

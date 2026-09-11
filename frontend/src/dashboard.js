@@ -49,7 +49,7 @@ function initUserSession() {
 function resolveInitialWorkspace() {
   const params = new URLSearchParams(window.location.search);
   const tab = params.get('tab');
-  const targetTab = (tab && ['studio', 'docs', 'live', 'guard'].includes(tab)) ? tab : 'studio';
+  const targetTab = (tab && ['studio', 'docs', 'live'].includes(tab)) ? tab : 'studio';
   switchWorkspace(targetTab, false);
 
   const topicParam = params.get('topic');
@@ -94,12 +94,6 @@ function switchWorkspace(workspaceKey, updateUrl = true) {
       navBtn: document.getElementById('nav-live-btn'),
       title: 'Live Fact-Checking & News Radar',
       crumb: '/ Live Fact-Check'
-    },
-    guard: {
-      section: document.getElementById('workspace-guard'),
-      navBtn: document.getElementById('nav-guard-btn'),
-      title: 'AgentPrahari Security Console',
-      crumb: '/ Security Console'
     }
   };
 
@@ -605,16 +599,36 @@ function renderDockPayload(format, payload) {
   if (!viewport) return;
 
   if (format === 'carousel_slides' && payload.slides && payload.slides.length > 0) {
-    let slidesHtml = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+    let headerBanner = `
+      <div class="border-4 border-ink bg-amberSoft p-4 sm:p-5 shadow-sm-brutal flex flex-col sm:flex-row items-center justify-between gap-4 mb-5">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 border-2 border-ink bg-amber text-ink grid place-items-center shadow-xs shrink-0">
+            <span class="material-symbols-outlined text-2xl text-ink">view_carousel</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h5 class="text-sm sm:text-base font-black text-ink">Export High-Res 1080px Slide Decks</h5>
+              <span class="px-1.5 py-0.5 bg-forge text-white text-[9px] font-black uppercase">Fixed Canvas</span>
+            </div>
+            <p class="text-xs text-muted font-bold mt-0.5">Render at 1080×1350px fixed canvas across 5 magazine & neobrutalist templates without fluid distortion.</p>
+          </div>
+        </div>
+        <button id="open-in-carousel-forge-btn" class="press border-3 border-ink bg-forge text-white hover:bg-forge/90 px-4 py-2.5 text-xs font-black shadow-xs flex items-center gap-2 shrink-0">
+          <span class="material-symbols-outlined text-sm">open_in_new</span> Open in Carousel Forge
+        </button>
+      </div>
+    `;
+
+    let slidesHtml = headerBanner + '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
     payload.slides.forEach(slide => {
       slidesHtml += `
         <div class="border-4 border-ink p-4 bg-paper shadow-sm-brutal space-y-2 flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between border-b-2 border-ink pb-2 mb-2">
               <span class="px-2 py-0.5 bg-yellow border border-ink text-xs font-black">SLIDE ${escapeHtml(slide.slide_number)}</span>
-              <span class="text-xs font-bold text-muted uppercase">${escapeHtml(slide.type)}</span>
+              <span class="text-xs font-bold px-1.5 py-0.5 border border-ink bg-card text-ink uppercase tracking-wide">${escapeHtml(slide.badge || slide.type)}</span>
             </div>
-            <h5 class="text-base font-black leading-tight text-ink mb-2">${escapeHtml(slide.headline)}</h5>
+            <h5 class="text-base font-black leading-tight text-ink mb-2">${slide.highlight_word ? escapeHtml(slide.headline).replace(new RegExp(`(${escapeHtml(slide.highlight_word).replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')})`, 'gi'), '<span class="bg-yellow px-1">$1</span>') : escapeHtml(slide.headline)}</h5>
             <p class="text-xs font-bold text-muted leading-relaxed whitespace-pre-wrap">${escapeHtml(slide.body)}</p>
           </div>
           <div class="pt-2 border-t-2 border-dashed border-ink flex items-center justify-between mt-3">
@@ -628,6 +642,15 @@ function renderDockPayload(format, payload) {
     });
     slidesHtml += '</div>';
     viewport.innerHTML = slidesHtml;
+
+    // Wire open in carousel forge
+    document.getElementById('open-in-carousel-forge-btn')?.addEventListener('click', () => {
+      sessionStorage.setItem('kiln_carousel_export_data', JSON.stringify({
+        topic: state.latestPipelineData?.topic || 'Verified Research',
+        slides: payload.slides
+      }));
+      window.location.href = '/carousel.html';
+    });
 
     // Wire per-slide copy
     viewport.querySelectorAll('.copy-dock-slide').forEach(sb => {

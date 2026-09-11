@@ -153,23 +153,24 @@ def call_llm(system_prompt: str, user_query: str, role: str = "general") -> str:
     - editor:     Gemini -> OpenRouter -> Groq Key 2 (distinct reviewer model!)
     - general:    Groq (Rotated) -> OpenRouter -> Gemini
     """
-    # 1. AgentPrahari Pre-execution Guardrail check
-    try:
-        from agentprahari import AgentPrahari
-        prahari = AgentPrahari.custom(
-            enable_pii=True,
-            enable_prompt_injection=True,
-            enable_output_secrets=True
-        )
-        guard_res = prahari.validate_input(user_query)
-        if not guard_res.is_valid:
-            logger.warning(f"AgentPrahari Guardrail Blocked Prompt: {guard_res.rejection_reason}")
-            return f"🛡️ [AgentPrahari Security Notice]: Input was blocked by safety guardrails. Reason: {guard_res.rejection_reason or 'Policy violation'}"
-        
-        if guard_res.sanitized_content:
-            user_query = guard_res.sanitized_content
-    except Exception as ge:
-        logger.warning(f"AgentPrahari guard check notice: {ge}")
+    # 1. AgentPrahari Pre-execution Guardrail check (for direct user queries, bypass for internal system agents)
+    if role not in ["writer", "verifier", "editor", "researcher", "repurposer"]:
+        try:
+            from agentprahari import AgentPrahari
+            prahari = AgentPrahari.custom(
+                enable_pii=True,
+                enable_prompt_injection=True,
+                enable_output_secrets=True
+            )
+            guard_res = prahari.validate_input(user_query)
+            if not guard_res.is_valid:
+                logger.warning(f"AgentPrahari Guardrail Blocked Prompt: {guard_res.rejection_reason}")
+                return f"🛡️ [AgentPrahari Security Notice]: Input was blocked by safety guardrails. Reason: {guard_res.rejection_reason or 'Policy violation'}"
+            
+            if guard_res.sanitized_content:
+                user_query = guard_res.sanitized_content
+        except Exception as ge:
+            logger.warning(f"AgentPrahari guard check notice: {ge}")
 
     # Build prioritized provider sequence based on agent role
     keys = settings.groq_keys

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="KILN Studio Carousel Forge: Design and export pixel-perfect 1080px Instagram and LinkedIn carousel slide decks." />
+  <title>KILN Studio | Carousel Forge</title>
+  <link rel="icon" type="image/png" href="/static/kiln-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- All Required Web Fonts for Canvas & Export Matching Reference Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Lora:ital,wght@0,400..700;1,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Playfair+Display:ital,wght@0,500..800;1,500..800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&family=Syne:wght@500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" crossorigin="anonymous" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,line-clamp"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { 
+            ink: '#1E1B2E',
+            paper: '#FDFBF7',
+            card: '#FFFFFF',
+            forge: '#FF5B22',
+            forgeSoft: '#FFF0E8',
+            amber: '#FFA629',
+            amberSoft: '#FFF8EB',
+            violet: '#7B61FF',
+            violetDark: '#5E43F3',
+            violetSoft: '#F2EFFF',
+            muted: '#524C61',
+            soft: '#F4EFEA',
+            gold: '#E8B923'
+          },
+          fontFamily: {
+            display: ['Space Grotesk', 'sans-serif'],
+            body: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+            anton: ['Anton', 'sans-serif'],
+            syne: ['Syne', 'sans-serif'],
+            serif: ['Playfair Display', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Space Grotesk', sans-serif; background-color: #FDFBF7; color: #1E1B2E; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: #FDFBF7; border-left: 3px solid #1E1B2E; }
+    ::-webkit-scrollbar-thumb { background: #FF5B22; border: 2px solid #1E1B2E; }
+    .shadow-brutal { box-shadow: 8px 8px 0 #1E1B2E; }
+    .shadow-sm-brutal { box-shadow: 4px 4px 0 #1E1B2E; }
+    .shadow-xs { box-shadow: 2px 2px 0 #1E1B2E; }
+    .press { transition: transform .14s ease, box-shadow .14s ease, background .14s ease; }
+    .press:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #1E1B2E; }
+    .press:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #1E1B2E; }
+    
+    /* Fixed 1080px Canvas Wrapper */
+    #carousel-canvas-wrapper {
+      position: relative;
+      overflow: hidden;
+      box-shadow: 10px 10px 0 #1E1B2E;
+      border: 3px solid #1E1B2E;
+      background: #EAE6DF;
+      transition: width 0.15s ease, height 0.15s ease;
+    }
+    #active-slide-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: top left;
+    }
+  </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col antialiased selection:bg-forge selection:text-white">
+
+  <!-- ========================================================================= -->
+  <!-- TOP NAVIGATION HEADER -->
+  <!-- ========================================================================= -->
+  <header class="border-b-4 border-ink bg-card px-4 md:px-6 py-2.5 shrink-0 z-40 flex items-center justify-between shadow-xs">
+    <div class="flex items-center gap-4">
+      <a href="/dashboard.html?tab=studio" class="press border-2 border-ink bg-paper hover:bg-yellowSoft px-3 py-1.5 text-xs font-black shadow-xs flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-sm">arrow_back</span>
+        Creator Studio
+      </a>
+
+      <div class="h-6 w-0.5 bg-ink/20 hidden sm:block"></div>
+
+      <div class="flex items-center gap-2.5">
+        <img src="/static/kiln-logo.png" alt="KILN Studio Logo" class="h-7 w-auto object-contain shrink-0" />
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-black tracking-tight text-ink leading-none">CAROUSEL FORGE</h1>
+            <span class="px-2 py-0.5 bg-forge text-white border border-ink text-[10px] font-black uppercase">11 Design Themes</span>
+          </div>
+          <p class="text-[10px] font-bold text-muted mt-0.5 hidden sm:block">Exact 1080px Fixed Canvas Exporter</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Controls: Ratio Toggle & Export Actions -->
+    <div class="flex items-center gap-3">
+      <!-- Aspect Ratio Switcher -->
+      <div class="border-2 border-ink p-1 bg-paper shadow-xs flex items-center gap-1">
+        <button id="ratio-toggle-portrait" class="px-2.5 py-1 text-xs font-black border border-transparent bg-forge text-white transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-xs">crop_portrait</span>
+          <span class="hidden md:inline">Portrait 4:5</span>
+        </button>
+        <button id="ratio-toggle-square" class="px-2.5 py-1 text-xs font-black border border-transparent bg-card text-ink hover:bg-yellowSoft transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-xs">crop_square</span>
+          <span class="hidden md:inline">Square 1:1</span>
+        </button>
+      </div>
+
+      <!-- Quick Actions -->
+      <button id="copy-slide-clipboard-btn" class="press border-2 border-ink bg-paper hover:bg-yellowSoft px-3 py-2 text-xs font-black shadow-xs hidden sm:flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-sm">content_copy</span>
+        Copy Slide
+      </button>
+
+      <button id="export-slide-png-btn" class="press border-2 border-ink bg-card hover:bg-yellowSoft px-3.5 py-2 text-xs font-black shadow-xs flex items-center gap-1.5 text-ink">
+        <span class="material-symbols-outlined text-sm text-forge">download</span>
+        Download Slide (PNG)
+      </button>
+
+      <button id="export-all-zip-btn" class="press border-2 border-ink bg-violet hover:bg-violetDark text-white px-4 py-2 text-xs font-black shadow-xs flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-sm">folder_zip</span>
+        Export All (ZIP)
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN WORKSPACE LAYOUT (3 COLUMNS) -->
+  <!-- ========================================================================= -->
+  <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-hidden">
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- LEFT SIDEBAR: TEMPLATES GALLERY & PRESETS (Col 3) -->
+    <!-- --------------------------------------------------------------------- -->
+    <aside class="lg:col-span-3 border-r-4 border-ink bg-card p-2.5 overflow-y-auto space-y-3 flex flex-col justify-between">
+      <div class="space-y-3">
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <div>
+              <h3 class="text-xs font-black uppercase tracking-wider text-ink">Design Templates</h3>
+              <p class="text-[10px] text-muted font-medium leading-none">11 curated aesthetic styles with 1-click loading.</p>
+            </div>
+            <span class="text-[9px] font-bold text-forge bg-forgeSoft px-1.5 py-0.5 border border-forge">11 Presets</span>
+          </div>
+
+          <!-- Modern Visual 2-Column Template Grid (Compact Thumbnails) -->
+          <div class="grid grid-cols-2 gap-1.5">
+            
+            <!-- 1. KILN Neobrutalist Gold -->
+            <div class="group border-2 border-ink bg-paper p-1 shadow-xs hover:border-forge transition flex flex-col justify-between cursor-pointer relative ring-2 ring-forge active-template rounded-xs" data-theme-id="kiln_neobrutalist">
+              <div class="h-14 bg-[#F9F6EE] border border-[#111] p-1 flex flex-col justify-between shadow-[1px_1px_0_#111] mb-1 rounded-xs overflow-hidden">
+                <div class="flex justify-between items-center leading-none">
+                  <span class="text-[5px] font-black bg-[#E8B923] text-[#111] px-0.5 border border-[#111]">VERIFIED</span>
+                  <span class="text-[5px] font-mono text-[#555]">01/06</span>
+                </div>
+                <div class="my-auto">
+                  <div class="text-[7px] font-extrabold text-[#111] leading-tight truncate">GPT-6 <span class="bg-[#E8B923] px-0.5 border border-[#111]">economics</span></div>
+                </div>
+                <div class="flex justify-between items-center border-t border-[#111] pt-0.5 leading-none">
+                  <span class="text-[4.5px] font-bold text-[#111]">@kilnstudio</span>
+                  <span class="text-[5px] text-[#E8B923]">★</span>
+                </div>
+              </div>
+              <div>
+                <div class="font-black text-[9px] text-ink truncate">1. Neobrutalist Gold</div>
+                <div class="flex items-center gap-1 mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#E8B923]"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#F9F6EE] border border-ink"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#111]"></span>
+                  <span class="text-[7.5px] font-bold text-muted ml-auto">Paper Gold</span>
+                </div>
+              </div>
+              <button class="preset-deck-btn mt-1 w-full press py-0.5 bg-ink text-white hover:bg-forge text-[8.5px] font-black text-center transition flex items-center justify-center gap-1 rounded-xs" data-preset-id="gpt6_astra">
+                <span>🏆</span> Load Deck
+              </button>
+            </div>
+
+            <!-- 2. Aura Glow & Glass -->
+            <div class="group border-2 border-ink bg-paper p-1 shadow-xs hover:border-forge transition flex flex-col justify-between cursor-pointer relative rounded-xs" data-theme-id="aura_glass">
+              <div class="h-14 bg-[#09090C] border border-[#2A2A35] p-1 flex flex-col justify-between mb-1 rounded-xs overflow-hidden relative" style="background-image:radial-gradient(circle at 80% 20%, rgba(255,91,34,0.4) 0%, transparent 60%);">
+                <div class="flex justify-between items-center leading-none">
+                  <span class="text-[5px] font-bold text-white">founder</span>
+                  <span class="text-[6px] text-white/60">↗</span>
+                </div>
+                <div class="my-auto">
+                  <div class="text-[7px] font-bold text-white leading-tight truncate">Your Offer is <span class="bg-white/10 px-0.5 border border-white/20 text-white rounded">Too Weak</span></div>
+                </div>
+                <div class="flex justify-between items-center border-t border-white/10 pt-0.5 leading-none">
+                  <span class="text-[4.5px] text-white/50">kiln studio</span>
+                  <span class="text-[5px] text-[#FF5B22]">●</span>
+                </div>
+              </div>
+              <div>
+                <div class="font-black text-[9px] text-ink truncate">2. Aura Glow Glass</div>
+                <div class="flex items-center gap-1 mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#FF5B22]"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#0D0D11]"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+                  <span class="text-[7.5px] font-bold text-muted ml-auto">Amber Glow</span>
+                </div>
+              </div>
+              <button class="preset-deck-btn mt-1 w-full press py-0.5 bg-[#FF5B22] text-white hover:bg-black text-[8.5px] font-black text-center transition flex items-center justify-center gap-1 rounded-xs" data-preset-id="aura_offer">
+                <span>🔥</span> Load Deck
+              </button>
+            </div>
+
+            <!-- 3. LinkedIn Authority (EN) -->
+            <div class="group border-2 border-ink bg-paper p-1 shadow-xs hover:border-forge transition flex flex-col justify-between cursor-pointer relative rounded-xs" data-theme-id="linkedin_authority">
+              <div class="h-14 bg-white border border-[#E0E0E0] p-1 flex flex-col justify-between mb-1 rounded-xs overflow-hidden border-l-2 border-l-[#E53935]">
+                <div class="flex justify-between items-center leading-none">
+                  <span class="text-[5px] font-black text-[#E53935] bg-red-50 px-0.5">[2] VALUE</span>
+                  <span class="text-[5px] font-mono text-gray-400">02/06</span>
+                </div>
+                <div class="my-auto">
+                  <div class="text-[7px] font-black text-[#111] leading-tight uppercase truncate">LACK OF VALUE</div>
+                  <div class="text-[4.5px] text-gray-500 bg-gray-50 px-0.5 truncate">«Why choose you?»</div>
+                </div>
+                <div class="flex justify-between items-center border-t border-gray-100 pt-0.5 leading-none">
+                  <span class="text-[4.5px] text-gray-500 font-bold">@kilnstudio</span>
+                  <span class="text-[4.5px] font-bold text-[#E53935]">AUTHORITY</span>
+                </div>
+              </div>
+              <div>
+                <div class="font-black text-[9px] text-ink truncate">3. LinkedIn Authority</div>
+                <div class="flex items-center gap-1 mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#E53935]"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-white border border-ink"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#111]"></span>
+                  <span class="text-[7.5px] font-bold text-muted ml-auto">White & Red</span>
+                </div>
+              </div>
+              <button class="preset-deck-btn mt-1 w-full press py-0.5 bg-ink text-white hover:bg-[#E53935] text-[8.5px] font-black text-center transition flex items-center justify-center gap-1 rounded-xs" data-preset-id="linkedin_mistakes">
+                <span>💼</span> Load Deck
+              </button>
+            </div>
+
+            <!-- 4. Bold Kinetic Condensed -->
+            <div class="group border-2 border-ink bg-paper p-1 shadow-xs hover:border-forge transition flex flex-col justify-between cursor-pointer relative rounded-xs" data-theme-id="bold_condensed">
+              <div class="h-14 bg-[#35315C] p-1 flex flex-col justify-between mb-1 rounded-xs overflow-hidden">
+                <div class="flex justify-between items-center leading-none">
+                  <span class="text-[5px] font-black text-[#FF80AB]">GROWTH</span>
+                  <span class="text-[5px] text-white/50">01/05</span>
+                </div>
+                <div class="my-auto">
+                  <div class="text-[7.5px] font-black text-white leading-none tracking-tight truncate">GOING <span class="text-[#FF80AB]">VIRAL</span></div>
+                  <div class="text-[4.5px] text-white/70 mt-0.5 truncate">500k+ impressions.</div>
+                </div>
+                <div class="flex justify-between items-center border-t border-white/10 pt-0.5 leading-none">
+                  <span class="text-[4.5px] text-white/60">@kilnstudio</span>
+                  <span class="text-[5px] text-[#FF80AB]">⚡</span>
+                </div>
+              </div>
+              <div>
+                <div class="font-black text-[9px] text-ink truncate">4. Bold Kinetic</div>
+                <div class="flex items-center gap-1 mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#35315C]"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#FF80AB]"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                  <span class="text-[7.5px] font-bold text-muted ml-auto">Indigo Neon</span>
+                </div>
+              </div>
+              <button class="preset-deck-btn mt-1 w-full press py-0.5 bg-[#35315C] text-[#FF80AB] hover:bg-black text-[8.5px] font-black text-center transition flex items-center justify-center gap-1 rounded-xs" data-preset-id="viral_kinetic">
+                <span>⚡</span> Load Deck
+              </button>
+            </div>
+
+            <!-- 5. Retro Pill Stack & Chat -->
+            <div class="group border-2 border-ink bg-paper p-1 shadow-xs hover:border-forge transition flex flex-col justify-between cursor-pointer relative rounded-xs" data-theme-id="retro_pill_stack">
+              <div class="h-14 bg-[#FF4B26] p-1 flex flex-col justify-between mb-1 rounded-xs overflow-hidden">
+                <div class="flex justify-between items-center leading-none">
+                  <span class="text-[5px] font-black bg-white text-[#FF4B26] px-0.5 rounded-full">TIPS</span>
+                  <span class="text-[5px] text-white/70">02/05</span>
+                </div>
+                <div class="my-auto">
+                  <div class="bg-white rounded px-0.5 py-0.2 mb-0.5">
+                    <div class="text-[5px] font-bold text-[#FF4B26] truncate">💬 Stop hallucinating?</div>
+                  </div>
+                  <div class="bg-[#111] text-white rounded px-0.5 text-[4.5px] truncate">Consensus loop.</div>
+                </div>
+                <div class="flex justify-between items-center border-t border-white/20 pt-0.5 leading-none">
+                  <span class="text-[4.5px] text-white/80">@kilnstudio</span>
+                  <span class="text-[5px] text-yellow-300">★</span>
+                </div>
+              </div>
+              <div>
+                <div class="font-black text-[9px] text-ink truncate">5. Retro Pill & Chat</div>
+                <div class="flex items-center gap-1 mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#FF4B26]"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span>
+                  <span class="text-[7.5px] font-bold text-muted ml-auto">Flame Orange</span>
+                </div>
+              </div>
+              <button class="preset-deck-btn mt-1 w-full press py-0.5 bg-[#FF4B26] text-white hover:bg-black text-[8.5px] font-black text-center transition flex items-center justify-center gap-1 rounded-xs" data-preset-id="retro_pill_chat">
+                <span>💬</span> Load Deck
+              </button>
+            </div>
+
+            <!-- 6. Boho Roadmap & Flow Arrow -->
+            <div class="group border-2 border-ink bg-paper p-1 shadow-xs hover:border-forge transition flex flex-col justify-between cursor-pointer relative rounded-xs" data-theme-id="boho_roadmap">
+              <div class="h-14 bg-[#F5F2EB] border border-[#E3DFD5] p-1 flex flex-col justify-between mb-1 rounded-xs overflow-hidden relative">
+                <div class="flex justify-between items-center leading-none">
+                  <span class="text-[5px] font-serif text-[#C4634A]">career pivot</span>
+                  <span class="text-[5px] font-mono text-[#8C8476]">02/07</span>
+                </div>
+                <div class="my-auto relative">
+                  <div class="text-[7px] font-serif font-bold text-[#1A1918] leading-tight truncate">Step 1: Skill Audit</div>
+                  <svg class="w-8 h-2 text-[#C4634A] mt-0.5" viewBox="0 0 60 20" fill="none">
+                    <path d="M5 10 Q 30 18 55 5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                  </svg>
+                </div>
+                <div class="flex justify-between items-center border-t border-[#E3DFD5] pt-0.5 leading-none">
+                  <span class="text-[4.5px] text-[#7A746B]">@kilnstudio</span>
+                  <span class="text-[5px] text-[#C4634A]">🌿</span>
+                </div>
+              </div>
+              <div>
+                <div class="font-black text-[9px] text-ink truncate">6. Boho Roadmap</div>
+                <div class="flex items-center gap-1 mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#F5F2EB] border border-ink"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#C4634A]"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#1A1918]"></span>
+                  <span class="text-[7.5px] font-bold text-muted ml-auto">Warm Sand</span>
+                </div>
+              </div>
+              <button class="preset-deck-btn mt-1 w-full press py-0.5 bg-[#C4634A] text-white hover:bg-black text-[8.5px] font-black text-center transition flex items-center justify-center gap-1 rounded-xs" data-preset-id="boho_roadmap">
+                <span>🌿</span> Load Deck
+              </button>
+            </div>
+
+            <!-- 7. Minimal Publication -->
+            <div class="group border-2 border-ink bg-paper p-1 shadow-xs hover:border-forge transition flex flex-col justify-between cursor-pointer relative rounded-xs" data-theme-id="minimal_editorial">
+              <div class="h-14 bg-[#F7F5EF] border border-[#E3DFD5] border-t-2 border-t-[#C4634A] p-1 flex flex-col justify-between mb-1 rounded-xs overflow-hidden">
+                <div class="flex justify-between items-center leading-none">
+                  <span class="text-[5px] font-serif font-bold text-[#C4634A]">Kiln</span>
+                  <span class="text-[5px] font-mono text-gray-400">01/04</span>
+                </div>
+                <div class="my-auto">
+                  <div class="text-[8px] font-serif text-[#C4634A] leading-none">1</div>
+                  <div class="text-[6.5px] font-serif font-bold text-[#211D17] leading-tight truncate">Sovereign AI Stack</div>
+                </div>
+                <div class="flex justify-between items-center border-t border-[#E3DFD5] pt-0.5 leading-none">
+                  <span class="text-[4.5px] text-gray-500">@kilnstudio</span>
+                  <span class="text-[4.5px] text-[#C4634A]">kilnstudio</span>
+                </div>
+              </div>
+              <div>
+                <div class="font-black text-[9px] text-ink truncate">7. Minimal Editorial</div>
+                <div class="flex items-center gap-1 mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#F7F5EF] border border-ink"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#C4634A]"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#211D17]"></span>
+                  <span class="text-[7.5px] font-bold text-muted ml-auto">News Serif</span>
+                </div>
+              </div>
+              <button class="preset-deck-btn mt-1 w-full press py-0.5 bg-[#211D17] text-white hover:bg-[#C4634A] text-[8.5px] font-black text-center transition flex items-center justify-center gap-1 rounded-xs" data-preset-id="minimal_editorial">
+                <span>📰</span> Load Deck
+              </button>
+            </div>
+
+            <!-- 8. Electric Cobalt & Acid Lime -->
+            <div class="group border-2 border-ink bg-paper p-1 shadow-xs hover:border-forge transition flex flex-col justify-between cursor-pointer relative rounded-xs" data-theme-id="acid_cobalt">
+              <div class="h-14 bg-[#0B1A3D] p-1 flex flex-col justify-between mb-1 rounded-xs overflow-hidden border-r-2 border-r-[#E2F952]">
+                <div class="flex justify-between items-center leading-none">
+                  <span class="text-[5px] font-black bg-[#E2F952] text-[#0B1A3D] px-0.5">LEVER 01</span>
+                  <span class="text-[5px] font-bold text-[#E2F952]">01/05</span>
+                </div>
+                <div class="my-auto">
+                  <div class="text-[7px] font-black text-white leading-tight uppercase truncate">SCALE TO <span class="bg-[#E2F952] text-[#0B1A3D] px-0.5">$10M</span></div>
+                </div>
+                <div class="flex justify-between items-center border-t border-white/20 pt-0.5 leading-none">
+                  <span class="text-[4.5px] text-white font-bold">@kilnstudio</span>
+                  <span class="text-[4.5px] font-black text-[#E2F952]">SWIPE ➔</span>
+                </div>
+              </div>
+              <div>
+                <div class="font-black text-[9px] text-ink truncate">8. Cobalt & Acid Lime</div>
+                <div class="flex items-center gap-1 mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#0B1A3D]"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#E2F952]"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                  <span class="text-[7.5px] font-bold text-muted ml-auto">SaaS Growth</span>
+                </div>
+              </div>
+              <button class="preset-deck-btn mt-1 w-full press py-0.5 bg-[#0B1A3D] text-[#E2F952] hover:bg-black text-[8.5px] font-black text-center transition flex items-center justify-center gap-1 rounded-xs" data-preset-id="acid_cobalt">
+                <span>🚀</span> Load Deck
+              </button>
+            </div>
+
+            <!-- 9. Klowt Punch Purple -->
+            <div class="group border-2 border-ink bg-paper p-1 shadow-xs hover:border-forge transition flex flex-col justify-between cursor-pointer relative rounded-xs" data-theme-id="klowt_purple">
+              <div class="h-14 bg-[#F8F9FD] border border-gray-200 p-1 flex flex-col justify-between mb-1 rounded-xs overflow-hidden border-l-2 border-l-[#8B77EB]">
+                <div class="flex justify-end leading-none">
+                  <span class="text-[5px] font-mono text-gray-400">01/04</span>
+                </div>
+                <div class="my-auto">
+                  <div class="text-[6.5px] font-black text-[#0B0B0E] leading-tight truncate">99% don't post</div>
+                  <div class="inline-block bg-[#8B77EB] text-white font-black text-[6px] px-0.5 border border-[#0B0B0E] -rotate-2">
+                    do you?
+                  </div>
+                </div>
+                <div class="flex items-center gap-1 border-t border-gray-200 pt-0.5 leading-none">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#FF004F] text-[3px] text-white flex items-center justify-center font-bold">♪</span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#DC2743] text-[3px] text-white flex items-center justify-center font-bold">📷</span>
+                  <span class="w-1.5 h-1.5 rounded-xs bg-[#0A66C2] text-[3px] text-white flex items-center justify-center font-bold">in</span>
+                  <span class="text-[4.5px] font-bold text-gray-800 ml-auto truncate">@klowt</span>
+                </div>
+              </div>
+              <div>
+                <div class="font-black text-[9px] text-ink truncate">9. Klowt Punch</div>
+                <div class="flex items-center gap-1 mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#8B77EB]"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#F8F9FD] border border-ink"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#0B0B0E]"></span>
+                  <span class="text-[7.5px] font-bold text-muted ml-auto">Viral Purple</span>
+                </div>
+              </div>
+              <button class="preset-deck-btn mt-1 w-full press py-0.5 bg-[#8B77EB] text-white hover:bg-black text-[8.5px] font-black text-center transition flex items-center justify-center gap-1 rounded-xs" data-preset-id="klowt_purple">
+                <span>🟣</span> Load Deck
+              </button>
+            </div>
+
+            <!-- 10. Monochrome Editorial & Asterisk -->
+            <div class="group border-2 border-ink bg-paper p-1 shadow-xs hover:border-forge transition flex flex-col justify-between cursor-pointer relative rounded-xs" data-theme-id="monochrome_editorial">
+              <div class="h-14 bg-[#E8EAE6] border border-[#111]/20 p-1 flex flex-col justify-between mb-1 rounded-xs overflow-hidden border-l-2 border-l-[#111]">
+                <div class="flex justify-between items-center leading-none">
+                  <span class="text-[6px] font-black text-[#111]">✱</span>
+                  <span class="text-[5px] text-[#111] rounded-full border border-[#111] w-2.5 h-2.5 flex items-center justify-center">↙</span>
+                </div>
+                <div class="my-auto">
+                  <div class="text-[6.5px] font-bold text-[#111] leading-tight truncate">Be your compass</div>
+                </div>
+                <div class="flex justify-between items-center border-t border-[#111]/10 pt-0.5 leading-none">
+                  <span class="text-[4.5px] font-bold uppercase text-[#111]">KILN</span>
+                  <span class="text-[4.5px] font-mono text-gray-500">01/04</span>
+                </div>
+              </div>
+              <div>
+                <div class="font-black text-[9px] text-ink truncate">10. Mono Asterisk</div>
+                <div class="flex items-center gap-1 mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#E8EAE6] border border-ink"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#111113]"></span>
+                  <span class="text-[7.5px] font-bold text-muted ml-auto">Minimal Fog</span>
+                </div>
+              </div>
+              <button class="preset-deck-btn mt-1 w-full press py-0.5 bg-[#111113] text-white hover:bg-black text-[8.5px] font-black text-center transition flex items-center justify-center gap-1 rounded-xs" data-preset-id="monochrome_editorial">
+                <span>✱</span> Load Deck
+              </button>
+            </div>
+
+            <!-- 11. Forest Slate & Citrus Lime -->
+            <div class="group border-2 border-ink bg-paper p-1 shadow-xs hover:border-forge transition flex flex-col justify-between cursor-pointer relative col-span-2 sm:col-span-1 rounded-xs" data-theme-id="forest_lime">
+              <div class="h-14 bg-[#132523] border border-[#1E3835] p-1 flex flex-col justify-between mb-1 rounded-xs overflow-hidden border-r-2 border-r-[#CCF32F]">
+                <div class="flex justify-between items-center leading-none">
+                  <span class="text-[8px] font-black text-[#CCF32F] leading-none">01</span>
+                  <span class="w-2.5 h-2.5 rounded-full border border-[#CCF32F]/50 text-[#CCF32F] text-[4px] flex items-center justify-center">✓</span>
+                </div>
+                <div class="my-auto">
+                  <div class="text-[6.5px] font-bold text-white leading-tight truncate">Marketing is <span class="text-[#CCF32F]">human</span></div>
+                </div>
+                <div class="flex justify-between items-center border-t border-white/10 pt-0.5 leading-none">
+                  <span class="text-[4.5px] text-[#8FA8A3]">@kilnstudio</span>
+                  <span class="text-[4.5px] font-bold text-[#CCF32F]">01/04</span>
+                </div>
+              </div>
+              <div>
+                <div class="font-black text-[9px] text-ink truncate">11. Forest Lime</div>
+                <div class="flex items-center gap-1 mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#132523]"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#CCF32F]"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                  <span class="text-[7.5px] font-bold text-muted ml-auto">Pine & Lime</span>
+                </div>
+              </div>
+              <button class="preset-deck-btn mt-1 w-full press py-0.5 bg-[#132523] text-[#CCF32F] hover:bg-black text-[8.5px] font-black text-center transition flex items-center justify-center gap-1 rounded-xs" data-preset-id="forest_lime">
+                <span>🍃</span> Load Deck
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Author Branding -->
+      <div class="border-t-2 border-ink pt-2 mt-2">
+        <label class="block text-[10px] font-black uppercase text-muted mb-0.5">Creator / Author Handle</label>
+        <input id="edit-handle-input" type="text" value="@kilnstudio" class="w-full border-2 border-ink bg-paper px-2 py-1 text-xs font-black shadow-xs focus:ring-0 focus:border-forge" placeholder="@yourbrand" />
+      </div>
+    </aside>
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- CENTER COLUMN: FIXED-CANVAS PREVIEW STAGE (Col 6) -->
+    <!-- --------------------------------------------------------------------- -->
+    <main class="lg:col-span-6 bg-[#EBE7DF] flex flex-col min-h-0 p-2 overflow-hidden relative">
+      <!-- Preview Header Toolbar -->
+      <div class="flex items-center justify-between border-2 border-ink bg-card px-2.5 py-1.5 shadow-xs mb-1.5 shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 bg-ink text-white text-xs font-black" id="current-slide-counter">Slide 1 of 6</span>
+          <span class="text-xs font-bold text-muted hidden sm:inline" id="deck-topic-title">GPT-6 Astra Breakdown</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="prev-slide-btn" class="press border border-ink bg-paper hover:bg-yellow px-2 py-0.5 text-xs font-black shadow-xs">
+            ← Prev
+          </button>
+          <button id="next-slide-btn" class="press border border-ink bg-paper hover:bg-yellow px-2 py-0.5 text-xs font-black shadow-xs">
+            Next →
+          </button>
+          <div class="h-4 w-0.5 bg-ink/20"></div>
+          <span class="text-[11px] font-mono text-muted" id="zoom-percentage-label">45%</span>
+        </div>
+      </div>
+
+      <!-- Viewport Stage with CSS Scale Transform (No dead space) -->
+      <div id="preview-viewport-container" class="flex-1 min-h-0 flex items-center justify-center overflow-hidden p-0.5 relative">
+        <div id="carousel-canvas-wrapper">
+          <!-- The exact 1080x1350 or 1080x1080 DOM Canvas Node -->
+          <div id="active-slide-canvas"></div>
+        </div>
+      </div>
+
+      <!-- Bottom Slide Strip Navigator (Compact) -->
+      <div class="border-2 border-ink bg-card px-2.5 py-1.5 shadow-xs mt-1.5 shrink-0">
+        <div class="flex items-center justify-between mb-1">
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] font-black uppercase text-ink">Slide Deck Strip</span>
+            <span class="text-[9px] font-bold text-muted hidden sm:inline">Click thumbnail to inspect</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button id="add-slide-btn" class="press border border-ink bg-paper hover:bg-yellowSoft px-1.5 py-0.5 text-[9px] font-black shadow-xs flex items-center gap-1">
+              <span class="material-symbols-outlined text-[11px]">add</span> Add
+            </button>
+            <button id="duplicate-slide-btn" class="press border border-ink bg-paper hover:bg-yellowSoft px-1.5 py-0.5 text-[9px] font-black shadow-xs flex items-center gap-1">
+              <span class="material-symbols-outlined text-[11px]">content_copy</span> Duplicate
+            </button>
+            <button id="delete-slide-btn" class="press border border-ink bg-dangerSoft text-danger hover:bg-danger hover:text-white px-1.5 py-0.5 text-[9px] font-black shadow-xs flex items-center gap-1">
+              <span class="material-symbols-outlined text-[11px]">delete</span> Delete
+            </button>
+          </div>
+        </div>
+
+        <div id="slide-deck-strip" class="flex gap-1.5 overflow-x-auto pb-0.5">
+          <!-- Deck thumbnails injected via JS -->
+        </div>
+      </div>
+    </main>
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- RIGHT SIDEBAR: SLIDE CONTENT EDITOR (Col 3) -->
+    <!-- --------------------------------------------------------------------- -->
+    <aside class="lg:col-span-3 border-l-4 border-ink bg-card p-4 overflow-y-auto space-y-4">
+      <div class="border-b-2 border-ink pb-3">
+        <h3 class="text-xs font-black uppercase tracking-wider text-muted">2. Edit Active Slide</h3>
+        <p class="text-[11px] text-muted font-medium mt-0.5">Customize content. Updates render in real-time on the 1080px canvas.</p>
+      </div>
+
+      <!-- Slide Layout Type -->
+      <div>
+        <label class="block text-[11px] font-black uppercase text-muted mb-1">Slide Layout Template</label>
+        <select id="edit-type-select" class="w-full border-2 border-ink bg-paper p-2 text-xs font-black shadow-xs focus:ring-0 focus:border-forge">
+          <option value="hook">Hook / Cover Slide</option>
+          <option value="step">Step / Takeaway Card</option>
+          <option value="source">Source Snapshot & Quote</option>
+          <option value="metric">Key Metric / Benchmark Gap</option>
+          <option value="checklist">3 Things to Watch Checklist</option>
+          <option value="cta">Save & Follow CTA Slide</option>
+        </select>
+      </div>
+
+      <!-- Top Badge / Step Label -->
+      <div>
+        <label class="block text-[11px] font-black uppercase text-muted mb-1">Badge Tag / Step Pill</label>
+        <input id="edit-badge-input" type="text" class="w-full border-2 border-ink bg-paper p-2 text-xs font-black shadow-xs focus:ring-0 focus:border-forge" placeholder="e.g. 4 VERIFIED TAKEAWAYS" />
+      </div>
+
+      <!-- Main Headline -->
+      <div>
+        <label class="block text-[11px] font-black uppercase text-muted mb-1">Main Headline</label>
+        <textarea id="edit-headline-input" rows="3" class="w-full border-2 border-ink bg-paper p-2 text-xs font-black shadow-xs focus:ring-0 focus:border-forge leading-snug" placeholder="Enter bold slide title..."></textarea>
+      </div>
+
+      <!-- Highlight Word/Phrase -->
+      <div>
+        <label class="block text-[11px] font-black uppercase text-muted mb-1">Highlighted Accent Word</label>
+        <input id="edit-highlight-input" type="text" class="w-full border-2 border-ink bg-paper p-2 text-xs font-black shadow-xs focus:ring-0 focus:border-forge" placeholder="e.g. rewriting (gets gold highlight)" />
+      </div>
+
+      <!-- Description / Body Text -->
+      <div>
+        <label class="block text-[11px] font-black uppercase text-muted mb-1">Body Text / Explanation / Quote</label>
+        <textarea id="edit-body-input" rows="4" class="w-full border-2 border-ink bg-paper p-2 text-xs font-medium shadow-xs focus:ring-0 focus:border-forge leading-relaxed" placeholder="Enter supporting takeaway or citation details..."></textarea>
+      </div>
+
+      <!-- Export Quick Buttons -->
+      <div class="border-t-2 border-ink pt-4 space-y-2">
+        <button onclick="document.getElementById('export-slide-png-btn').click()" class="press w-full border-2 border-ink bg-forge hover:bg-opacity-90 text-white p-2.5 font-black text-xs shadow-xs flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">download</span> Download Slide PNG (1080p)
+        </button>
+        <button onclick="document.getElementById('export-all-zip-btn').click()" class="press w-full border-2 border-ink bg-card hover:bg-yellowSoft p-2.5 font-black text-xs shadow-xs flex items-center justify-center gap-2 text-ink">
+          <span class="material-symbols-outlined text-sm">archive</span> Download Full Deck (ZIP)
+        </button>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="hidden fixed bottom-6 right-6 z-50 px-4 py-3 bg-ink text-paper border-2 border-forge shadow-brutal text-xs font-black flex items-center gap-2"></div>
+
+  <!-- Main script -->
+  <script type="module">
+    import { initCarouselForge } from '/src/carousel_forge.js';
+    initCarouselForge();
+  </script>
+</body>
+</html>

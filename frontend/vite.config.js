@@ -10,6 +10,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         dashboard: resolve(__dirname, 'dashboard.html'),
+        carousel: resolve(__dirname, 'carousel.html'),
         processing: resolve(__dirname, 'processing.html'),
         chat: resolve(__dirname, 'chat.html'),
         document: resolve(__dirname, 'document.html'),

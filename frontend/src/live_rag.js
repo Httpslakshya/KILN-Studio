@@ -4,18 +4,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Tab Switching
   const tabLiveRag = document.getElementById('tab-live-rag');
   const tabPipeline = document.getElementById('tab-pipeline');
-  const tabGuardrails = document.getElementById('tab-guardrails');
 
   const navPipelineBtn = document.getElementById('nav-pipeline-btn');
   const navLiveBtn = document.getElementById('nav-live-btn');
-  const navGuardBtn = document.getElementById('nav-guard-btn');
 
   const secLiveRag = document.getElementById('section-live-rag');
   const secPipeline = document.getElementById('section-pipeline');
-  const secGuardrails = document.getElementById('section-guardrails');
 
   function switchTab(activeTab, activeSec) {
-    [tabLiveRag, tabPipeline, tabGuardrails].forEach(t => {
+    [tabLiveRag, tabPipeline].forEach(t => {
       if (!t) return;
       t.classList.remove('bg-yellow');
       t.classList.add('bg-card');
@@ -25,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
       activeTab.classList.add('bg-yellow');
     }
 
-    [navPipelineBtn, navLiveBtn, navGuardBtn].forEach(btn => {
+    [navPipelineBtn, navLiveBtn].forEach(btn => {
       if (!btn) return;
       btn.className = 'w-full flex items-center gap-3 border-4 border-transparent hover:border-ink hover:bg-soft p-2.5 font-bold text-sm text-left transition';
     });
@@ -34,21 +31,17 @@ document.addEventListener('DOMContentLoaded', () => {
       navPipelineBtn.className = 'w-full flex items-center gap-3 bg-yellow border-4 border-ink shadow-sm-brutal p-2.5 font-black text-sm text-left transition';
     } else if (activeTab === tabLiveRag && navLiveBtn) {
       navLiveBtn.className = 'w-full flex items-center gap-3 bg-yellow border-4 border-ink shadow-sm-brutal p-2.5 font-black text-sm text-left transition';
-    } else if (activeTab === tabGuardrails && navGuardBtn) {
-      navGuardBtn.className = 'w-full flex items-center gap-3 bg-yellow border-4 border-ink shadow-sm-brutal p-2.5 font-black text-sm text-left transition';
     }
 
-    [secLiveRag, secPipeline, secGuardrails].forEach(s => s.classList.add('hidden'));
-    activeSec.classList.remove('hidden');
+    [secLiveRag, secPipeline].forEach(s => s && s.classList.add('hidden'));
+    if (activeSec) activeSec.classList.remove('hidden');
   }
 
   tabLiveRag?.addEventListener('click', () => switchTab(tabLiveRag, secLiveRag));
   tabPipeline?.addEventListener('click', () => switchTab(tabPipeline, secPipeline));
-  tabGuardrails?.addEventListener('click', () => switchTab(tabGuardrails, secGuardrails));
 
   navPipelineBtn?.addEventListener('click', () => switchTab(tabPipeline, secPipeline));
   navLiveBtn?.addEventListener('click', () => switchTab(tabLiveRag, secLiveRag));
-  navGuardBtn?.addEventListener('click', () => switchTab(tabGuardrails, secGuardrails));
 
   // Quick Query chips (Search)
   document.querySelectorAll('.quick-query-chip').forEach(chip => {
