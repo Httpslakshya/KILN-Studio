@@ -19,10 +19,10 @@ def index_document(filename: str, file_path: str) -> int:
         page_count = len(docs)
         logger.info(f"Successfully loaded {page_count} pages from {filename}.")
         
-        # Split documents into overlapping chunks
+        # Split documents into chunks with optimal context window
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=400
+            chunk_size=1500,
+            chunk_overlap=200
         )
         chunks = text_splitter.split_documents(docs)
         
@@ -34,9 +34,10 @@ def index_document(filename: str, file_path: str) -> int:
             else:
                 chunk.metadata["page_label"] = "1"
                 
-        # Index in Qdrant
+        # Index in Qdrant with rate-limiting backoff
+        from backend.api.documents import _index_chunks_with_backoff
         vector_db = get_vector_db()
-        vector_db.add_documents(chunks)
+        _index_chunks_with_backoff(vector_db, chunks, batch_size=30)
         logger.info(f"Added {len(chunks)} chunks to Qdrant collection for '{filename}'.")
         return page_count
         
@@ -179,29 +180,27 @@ def call_llm(system_prompt: str, user_query: str, role: str = "general") -> str:
 
     if role == "researcher":
         providers = [
+            ("Groq Account 1 (Qwen 27B)", lambda: _call_groq_direct(system_prompt, user_query, key_override=k1)),
+            ("Groq Account 2 (Qwen 27B)", lambda: _call_groq_direct(system_prompt, user_query, key_override=k2)),
             ("OpenRouter (Llama 3.3)", lambda: _call_openrouter_direct(system_prompt, user_query)),
-            ("Groq Account 1", lambda: _call_groq_direct(system_prompt, user_query, key_override=k1)),
-            ("Gemini Flash", lambda: _call_gemini_direct(system_prompt, user_query)),
         ]
     elif role == "verifier":
         providers = [
-            ("Groq Account 2 (Independent Verifier)", lambda: _call_groq_direct(system_prompt, user_query, key_override=k2)),
+            ("Groq Account 2 (Qwen 27B Verifier)", lambda: _call_groq_direct(system_prompt, user_query, key_override=k2)),
+            ("Groq Account 1 (Qwen 27B)", lambda: _call_groq_direct(system_prompt, user_query, key_override=k1)),
             ("OpenRouter (Llama 3.3)", lambda: _call_openrouter_direct(system_prompt, user_query)),
-            ("Gemini Flash", lambda: _call_gemini_direct(system_prompt, user_query)),
         ]
     elif role == "editor":
-        # Editor uses OpenRouter first for independent critique with ultra-low latency (<3s)
         providers = [
-            ("OpenRouter (Independent Critic)", lambda: _call_openrouter_direct(system_prompt, user_query)),
-            ("Groq Account 2", lambda: _call_groq_direct(system_prompt, user_query, key_override=k2)),
-            ("Gemini Flash", lambda: _call_gemini_direct(system_prompt, user_query)),
-        ]
-    else:  # writer or general
-        providers = [
-            ("Groq Account 1", lambda: _call_groq_direct(system_prompt, user_query, key_override=k1)),
-            ("Groq Account 2", lambda: _call_groq_direct(system_prompt, user_query, key_override=k2)),
+            ("Groq Account 2 (Qwen 27B Editor)", lambda: _call_groq_direct(system_prompt, user_query, key_override=k2)),
+            ("Groq Account 1 (Qwen 27B)", lambda: _call_groq_direct(system_prompt, user_query, key_override=k1)),
             ("OpenRouter (Llama 3.3)", lambda: _call_openrouter_direct(system_prompt, user_query)),
-            ("Gemini Flash", lambda: _call_gemini_direct(system_prompt, user_query)),
+        ]
+    else:  # writer or general Q&A
+        providers = [
+            ("Groq Account 1 (Qwen 27B)", lambda: _call_groq_direct(system_prompt, user_query, key_override=k1)),
+            ("Groq Account 2 (Qwen 27B)", lambda: _call_groq_direct(system_prompt, user_query, key_override=k2)),
+            ("OpenRouter (Llama 3.3)", lambda: _call_openrouter_direct(system_prompt, user_query)),
         ]
 
     content = None

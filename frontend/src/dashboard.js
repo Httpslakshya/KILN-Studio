@@ -1,4 +1,4 @@
-import { API_URL, apiFetch, apiPost, checkAuth } from './api.js';
+import { API_URL, apiFetch, apiPost, checkAuth, logout } from './api.js';
 
 // --- APPLICATION STATE ---
 const state = {
@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Load documents and route to active tab
   loadDocuments();
+  checkActiveIndexingJob();
   resolveInitialWorkspace();
 });
 
@@ -831,6 +832,78 @@ function populatePdfSelectDropdown() {
   }
 }
 
+let activePollInterval = null;
+
+function trackJobProgress(jobId, filename) {
+  if (activePollInterval) clearInterval(activePollInterval);
+
+  const feedback = document.getElementById('upload-feedback');
+  if (feedback) {
+    feedback.classList.remove('hidden');
+    feedback.textContent = `Indexing ${filename}...`;
+  }
+  sessionStorage.setItem('docmind_active_job', JSON.stringify({ jobId, filename }));
+
+  activePollInterval = setInterval(async () => {
+    try {
+      const statusRes = await apiFetch(`/api/upload/status/${jobId}`);
+      const job = statusRes.data;
+      if (!job) return;
+
+      const fb = document.getElementById('upload-feedback');
+      if (fb) fb.classList.remove('hidden');
+
+      if (job.status === 'processing' || job.status === 'queued' || job.status === 'rate_limited') {
+        if (fb) {
+          const pct = job.progress || 0;
+          const detailMsg = job.error ? ` — ${job.error}` : '';
+          fb.textContent = `Indexing ${filename}: ${pct}%${detailMsg}`;
+        }
+      } else if (job.status === 'completed') {
+        clearInterval(activePollInterval);
+        activePollInterval = null;
+        sessionStorage.removeItem('docmind_active_job');
+        if (fb) {
+          fb.textContent = `Indexed ${filename} successfully (${job.pages || 1} pages)!`;
+        }
+        showToast(`Indexing complete: ${filename}`);
+        setTimeout(() => {
+          if (fb) fb.classList.add('hidden');
+          loadDocuments();
+        }, 1500);
+      } else if (job.status === 'failed') {
+        clearInterval(activePollInterval);
+        activePollInterval = null;
+        sessionStorage.removeItem('docmind_active_job');
+        const errMsg = job.error || 'Indexing failed';
+        if (fb) {
+          fb.textContent = `Indexing failed: ${errMsg}`;
+        }
+        showToast(`Indexing failed: ${errMsg}`);
+      }
+    } catch (pollErr) {
+      console.warn('Status poll error:', pollErr);
+    }
+  }, 2000);
+}
+
+async function checkActiveIndexingJob() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem('docmind_active_job') || 'null');
+    if (saved && saved.jobId) {
+      trackJobProgress(saved.jobId, saved.filename);
+      return;
+    }
+
+    const res = await apiFetch('/api/upload/latest-job');
+    if (res.success && res.data && res.data.job_id) {
+      trackJobProgress(res.data.job_id, res.data.filename);
+    }
+  } catch (e) {
+    console.warn('Could not check active indexing jobs:', e);
+  }
+}
+
 async function handleUpload(file) {
   if (!file.name.toLowerCase().endsWith('.pdf')) {
     showToast('Please upload a PDF file.');
@@ -840,7 +913,7 @@ async function handleUpload(file) {
   const feedback = document.getElementById('upload-feedback');
   if (feedback) {
     feedback.classList.remove('hidden');
-    feedback.textContent = `Uploading and vectorizing ${file.name}...`;
+    feedback.textContent = `Uploading ${file.name}...`;
   }
 
   const formData = new FormData();
@@ -852,16 +925,13 @@ async function handleUpload(file) {
       body: formData
     });
 
-    if (res.success) {
-      if (feedback) feedback.textContent = 'Document indexed into Qdrant successfully!';
-      showToast(`Uploaded ${file.name}`);
-      setTimeout(() => {
-        if (feedback) feedback.classList.add('hidden');
-        loadDocuments();
-      }, 1500);
-    } else {
+    if (!res.success || !res.data?.job_id) {
       throw new Error(res.message || 'Upload failed');
     }
+
+    const jobId = res.data.job_id;
+    showToast(`Uploaded ${file.name}. Indexing started...`);
+    trackJobProgress(jobId, file.name);
   } catch (err) {
     if (feedback) feedback.textContent = `Upload error: ${err.message}`;
     showToast(`Upload failed: ${err.message}`);
@@ -1187,10 +1257,9 @@ function bindSharedModals() {
   modalClose?.addEventListener('click', () => modal?.classList.add('hidden'));
   settingsBtn?.addEventListener('click', () => modal?.classList.remove('hidden'));
   upgradeBtn?.addEventListener('click', () => showToast('KILN Studio Pro features are fully unlocked in this workspace!'));
-  logoutBtn?.addEventListener('click', () => {
-    localStorage.removeItem('docmind_session');
-    localStorage.removeItem('kiln_session');
-    window.location.href = '/index.html';
+  logoutBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    logout();
   });
 
   // Creator Modal controls

@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from typing import List
 from backend.services.live_rag.verification.cross_verifier import CrossSourceVerifier
 from backend.services.content_pipeline.state import ContentPipelineState, PipelineStepLog, VerifiedClaim
-from agentprahari import AgentPrahari
+from backend.services.live_rag.engine import AgentPrahari
 from backend.utils.logging_config import logger
 
 

@@ -8,7 +8,7 @@ import re
 from datetime import datetime, timezone
 from backend.services.content_pipeline.state import ContentPipelineState, PipelineStepLog, EditorCritique
 from backend.services.rag import call_llm
-from agentprahari import AgentPrahari
+from backend.services.live_rag.engine import AgentPrahari
 from backend.utils.logging_config import logger
 
 

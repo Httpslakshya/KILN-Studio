@@ -114,6 +114,9 @@ function startPolling(jobId, resolve, reject) {
       // Update steps based on progress and status
       if (job.status === 'queued') {
         activateStep('upload');
+      } else if (job.status === 'rate_limited') {
+        activateStep('embedding');
+        statusTitle.textContent = job.error || 'Rate limit pause (auto-resuming)...';
       } else if (job.status === 'processing') {
         if (job.progress >= 15 && job.progress < 45) {
           activateStep('chunk');

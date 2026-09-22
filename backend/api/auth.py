@@ -21,23 +21,36 @@ def cookie_options():
 
 EMAIL_REGEX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
+async def _parse_auth_request(request: Request) -> dict:
+    """Extracts credentials whether submitted as multipart Form data or JSON."""
+    content_type = request.headers.get("content-type", "").lower()
+    if "application/json" in content_type:
+        try:
+            data = await request.json()
+            return data if isinstance(data, dict) else {}
+        except Exception:
+            return {}
+    try:
+        form = await request.form()
+        return dict(form)
+    except Exception:
+        return {}
+
 @router.post("/api/signup")
-def api_signup(
-    email: str = Form(...),
-    password: str = Form(...),
-    name: str = Form("")
-):
+async def api_signup(request: Request):
     """
     Registers a new user account with email, password, and name.
-    Creates session upon successful creation and returns redirect to dashboard.
+    Accepts Form or JSON payloads. Creates active session upon success.
     """
-    clean_email = email.strip().lower()
-    clean_name = name.strip()
-    
-    logger.info(f"Signup attempt received for email: {clean_email}")
+    data = await _parse_auth_request(request)
+    email = str(data.get("email", "")).strip().lower()
+    password = str(data.get("password", "")).strip()
+    name = str(data.get("name", data.get("full_name", ""))).strip()
+
+    logger.info(f"Signup attempt received for email: {email}")
 
     # Validate inputs
-    if not clean_email or not EMAIL_REGEX.match(clean_email):
+    if not email or not EMAIL_REGEX.match(email):
         return error_response(
             message="Please provide a valid email address.",
             status_code=400
@@ -51,9 +64,9 @@ def api_signup(
 
     try:
         user = user_service.create_user(
-            email=clean_email,
+            email=email,
             password=password,
-            full_name=clean_name
+            full_name=name
         )
     except ValueError as val_err:
         return error_response(
@@ -67,12 +80,12 @@ def api_signup(
             status_code=500
         )
 
-    session_id = clean_email
+    session_id = email
     active_sessions.add(session_id)
 
     response = success_response(
         data={
-            "redirect": "/dashboard",
+            "redirect": "/dashboard.html",
             "session_id": session_id,
             "user": {
                 "email": user["email"],
@@ -92,37 +105,40 @@ def api_signup(
     return response
 
 @router.post("/api/login")
-def api_login(email: str = Form(...), password: str = Form(...)):
+async def api_login(request: Request):
     """
     Authenticates user login against stored credentials or Supabase Auth.
-    Registers active session and returns cookie/metadata.
+    Accepts Form or JSON payloads. Registers active session upon success.
     """
-    clean_email = email.strip().lower()
-    logger.info(f"Login attempt received for email: {clean_email}")
+    data = await _parse_auth_request(request)
+    email = str(data.get("email", "")).strip().lower()
+    password = str(data.get("password", "")).strip()
 
-    if not clean_email or not password:
+    logger.info(f"Login attempt received for email: {email}")
+
+    if not email or not password:
         return error_response(
             message="Email and password are required.",
             status_code=400
         )
 
-    user = user_service.authenticate_user(clean_email, password)
+    user = user_service.authenticate_user(email, password)
     if not user:
         return error_response(
-            message="Invalid email or password. Please try again or create an account.",
+            message="Invalid email or password. Please try again or switch to Create Account.",
             status_code=401
         )
 
-    session_id = clean_email
+    session_id = email
     active_sessions.add(session_id)
 
     response = success_response(
         data={
-            "redirect": "/dashboard",
+            "redirect": "/dashboard.html",
             "session_id": session_id,
             "user": {
                 "email": user["email"],
-                "full_name": user.get("full_name", clean_email.split('@')[0])
+                "full_name": user.get("full_name", email.split('@')[0])
             }
         },
         message="Login completed successfully"
@@ -135,17 +151,17 @@ def api_login(email: str = Form(...), password: str = Form(...)):
         **cookie_options()
     )
 
-    logger.info(f"Session registered successfully for {clean_email}.")
+    logger.info(f"Session registered successfully for {email}.")
     return response
 
 @router.post("/api/logout")
-def api_logout(request: Request):
+async def api_logout(request: Request):
     """Deletes active session cookies and deregisters session registry."""
     session_id = request.cookies.get("session_id")
     if not session_id:
         session_id = request.headers.get("x-session-id")
 
-    if session_id in active_sessions:
+    if session_id and session_id in active_sessions:
         active_sessions.remove(session_id)
         logger.info(f"Deregistered session: {session_id}")
 
@@ -165,18 +181,24 @@ def check_session(request: Request):
         session_id = request.headers.get("x-session-id")
 
     if session_id:
-        # Check active memory sessions or known persistent users
         clean_email = session_id.strip().lower()
-        if session_id in active_sessions or user_service.get_user_by_email(clean_email) or clean_email in ("guest@docmind.local", "guest@kiln.local"):
+        if (
+            session_id in active_sessions
+            or user_service.get_user_by_email(clean_email)
+            or clean_email in ("guest@docmind.local", "guest@kiln.local", "demo@kiln.local", "new-user@docmind.local")
+        ):
             active_sessions.add(session_id)
-            user_info = user_service.get_user_by_email(clean_email) or {"email": clean_email, "full_name": clean_email.split('@')[0]}
+            user_info = user_service.get_user_by_email(clean_email) or {
+                "email": clean_email,
+                "full_name": clean_email.split('@')[0].capitalize()
+            }
             return success_response(
                 data={
                     "authenticated": True,
                     "session_id": session_id,
                     "user": {
                         "email": user_info.get("email", clean_email),
-                        "full_name": user_info.get("full_name", clean_email.split('@')[0])
+                        "full_name": user_info.get("full_name", clean_email.split('@')[0].capitalize())
                     }
                 },
                 message="Authenticated successfully"

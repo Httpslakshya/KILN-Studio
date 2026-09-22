@@ -11,6 +11,7 @@
     <img src="https://img.shields.io/badge/Backend-FastAPI%20%7C%20Render-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI on Render" />
     <img src="https://img.shields.io/badge/Frontend-Vite%20%7C%20Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
     <img src="https://img.shields.io/badge/VectorDB-Qdrant%20Cloud-DC2626?style=for-the-badge&logo=qdrant&logoColor=white" alt="Qdrant" />
+    <img src="https://img.shields.io/badge/Auth-Supabase%20%2B%20PBKDF2-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase Auth" />
     <img src="https://img.shields.io/badge/Protocol-Anthropic%20MCP-4F46E5?style=for-the-badge" alt="MCP" />
   </p>
 
@@ -33,11 +34,13 @@
 
 * [Overview](#-overview)
 * [Live Deployment](#-live-deployment)
+* [Authentication & User Management](#-authentication--user-management)
 * [Autonomous Creator Forge (Core Engine)](#-autonomous-creator-forge-core-engine)
   * [The 4-Agent Closed-Loop Pipeline](#the-4-agent-closed-loop-pipeline)
   * [5 Instant Publication Formats](#5-instant-publication-formats)
   * [12 Target Audience Profiles](#12-target-audience-profiles)
   * [Private Document-Enriched Synergy](#private-document-enriched-synergy)
+* [Carousel Forge & Slide Exporter](#-carousel-forge--slide-exporter)
 * [System Architecture](#-system-architecture)
 * [Supporting Capabilities](#-supporting-capabilities)
   * [Cited PDF Knowledge Base](#cited-pdf-knowledge-base)
@@ -69,8 +72,22 @@ KILN Studio is deployed and fully operational in production across high-performa
 | **Backend API Engine** | **Render** | [**https://docmind-8qsv.onrender.com**](https://docmind-8qsv.onrender.com) | FastAPI + Uvicorn with AgentPrahari guardrails & multi-model LLM router |
 | **Interactive API Docs** | **Swagger UI** | [**https://docmind-8qsv.onrender.com/docs**](https://docmind-8qsv.onrender.com/docs) | OpenAPI interactive endpoints specification |
 | **Vector Database** | **Qdrant Cloud** | Managed AWS Cluster | Hybrid semantic retrieval with sub-50ms latency |
+| **Cloud Storage & Auth** | **Supabase** | Cloud Storage & Auth | S3-compatible cloud storage bucket and user auth |
 
-> 💡 **Try It Instantly:** Visit [**kiln-studioai.vercel.app**](https://kiln-studioai.vercel.app) and click **"Continue as Guest"** or **"Start with demo access"** to test the 4-agent creator forge without needing any setup!
+---
+
+## 🔐 Authentication & User Management
+
+KILN Studio provides a production-grade, workable authentication system featuring both Sign In and dedicated Sign Up:
+
+* **Dual-Layer Auth Architecture**:
+  1. **Supabase Auth Engine**: Primary cloud authentication provider for user signup, credential verification, and identity tokens.
+  2. **Local Salted PBKDF2 Fallback Store**: High-security fallback engine (`data/users.json`) utilizing `hashlib.pbkdf2_hmac` with 100,000 iterations and unique 16-byte cryptographic salts. Ensures 100% reliable local development and offline resilience.
+* **Workable Pages**:
+  * **Sign In (`/login` or `index.html`)**: Email & password authentication, real-time error feedback, and remember-me support.
+  * **Sign Up (`/signup` or `signup.html`)**: Complete registration form with full name, email, password strength check (min 6 characters), and password confirmation validation.
+  * **Instant Guest Mode**: 1-click **"Continue as Guest"** for instant demo evaluation without registration hurdles.
+* **Session Management**: Secure HTTP-only cookies combined with `x-session-id` headers and local storage sync for decoupled API client routing.
 
 ---
 
@@ -100,98 +117,95 @@ The flagship workspace of KILN Studio is built specifically for high-conviction 
                           ▼
             ┌───────────────────────────┐
             │      3. WRITER AGENT      │
-            │  Drafts Cited Narrative   │
-            │  Audience-Tailored Voice  │
+            │  5 Publication Formats    │
+            │  Citation Bracket Locking │
             └─────────────┬─────────────┘
-                          │ Draft
+                          │ First Draft
                           ▼
             ┌───────────────────────────┐
-            │   4. EDITOR CRITIC AGENT  │◄───┐
-            │  Groundedness Scoring     │    │ Auto-Revision
-            │  Hallucination Detection  │────┘ (if Score < 85%)
+            │     4. CRITIC AGENT       │
+            │  Audience Persona Scoring │
+            │  Self-Correcting Iteration│
             └─────────────┬─────────────┘
-                          │ Approved (Score ≥ 85%)
+                          │ Verified Output
                           ▼
-         Instant In-Place Creator Formats
+                 Production-Ready Asset
 ```
 
-1. **🕵️ Agent 1: Researcher**: Scrapes live RSS feeds, Google News streams, and indexed PDF collections for primary evidence.
-2. **✅ Agent 2: Verifier**: Organizes claims into a cross-source corroboration matrix. Enforces $\ge 2$ independent domain verification and calculates exponential freshness scores ($e^{-\lambda \Delta t}$).
-3. **✍️ Agent 3: Writer**: Synthesizes verified claims into punchy, authoritative prose with numbered citation anchors (`[1]`, `[2]`).
-4. **🧐 Agent 4: Editor Critic**: Evaluates groundedness (0–100%), citation density, and audience alignment. If unsubstantiated claims are detected, it triggers a targeted revision cycle back to the Writer.
-
----
-
 ### 5 Instant Publication Formats
-
-Switch instantly between publication-ready creator assets from a single run:
-
-| Format | Output Description |
-| :--- | :--- |
-| 📰 **Verified Article** | Deep-dive markdown essay with inline citations, Groundedness Scorecard, and clickable primary source tags. |
-| 💼 **LinkedIn Post** | Viral thought leadership draft formatted with clean spacing, hook opening, verified checkmarks (`✓`), and KILN creator header. |
-| 📱 **Interactive Carousel Deck** | Card-by-card slide deck with slide progression dots, clean visual formatting, and a **"Copy All Slides"** export button. |
-| 🎬 **Viral Reel / Short Script** | Timed video production script with scene visual cues, spoken dialogue, and on-screen text instructions. |
-| 📊 **Infometry Deep-Dive Blog** | Analytical report emphasizing statistics, corroborated metrics, and executive takeaways. |
+1. **Verified Technical Article**: Full-length analytical writeup with executive summary, claim-by-claim citations, and inline source attribution.
+2. **Viral LinkedIn Thought Leadership**: Hook-driven, skimmable post formatted with punchy whitespace and data callouts.
+3. **Carousel Deck**: Structured, multi-slide blueprints ready for immediate design export.
+4. **Viral Short-Form Reel / TikTok Script**: Scene-by-scene visual cues, on-screen text instructions, and retention-engineered spoken hooks.
+5. **Infometry Blog Post**: Structured editorial article tailored for corporate research publications.
 
 ---
 
-### 12 Target Audience Profiles
+## 🎨 Carousel Forge & Slide Exporter
 
-Tailor research and vocabulary to match your exact readership:
-* **Creators & Influencers**: Social Media Influencers, Storytellers & Reel Creators, Journalists & Media Publishers.
-* **Engineering & Technology**: AI & Software Engineers, System Architects, Academic Researchers.
-* **Business & Executive**: Startup Founders & VCs, Enterprise C-Suite Executives, Product Managers & Strategists, FinTech & Market Analysts.
-* **General Audience**: Tech & Media Enthusiasts, Curious Beginners (EL5 / Zero Jargon).
+KILN Studio features a dedicated **Carousel Forge** (`/carousel` or `carousel.html`) for designing and exporting 1080px social carousel decks:
+
+* **11 Designer Aesthetic Themes**:
+  1. *KILN Neobrutalist Gold* (Flagship cream paper, gold accents, bold ink borders)
+  2. *Aura Glow & Glass* (Translucent frosted glassmorphism, warm amber mesh glow)
+  3. *LinkedIn Authority* (Clean white & red brackets with question cards)
+  4. *Bold Kinetic Condensed* (Deep indigo, Anton caps & alternating neon pink)
+  5. *Retro Pill Stack & Chat* (Flame orange, stacked badges & iMessage bubbles)
+  6. *Boho Roadmap* (Warm sand, Playfair serif, authentic flow arrows)
+  7. *Minimal Editorial* (Refined Newsreader serif, terracotta accents)
+  8. *Cobalt & Acid Lime* (Electric blue & high-voltage neon yellow)
+  9. *Klowt Punch* (Viral purple gradient & social handles)
+  10. *Mono Asterisk* (Minimalist dark carbon & editorial symbols)
+  11. *Forest Lime* (Deep pine green & citrus accents)
+* **Real-Time WYSIWYG Editor**:
+  * Live multiline breaking: respects explicit `\n` (pressing Enter) and `<br>` tags.
+  * Length-responsive text fitting: dynamically scales headlines to fit without clipping.
+  * Highlight pill formatting locked to line baselines.
+  * Custom slide deck strip with add, duplicate, and delete controls.
+* **1080px High-Resolution Canvas Exporter**:
+  * Utilizes native SVG `<foreignObject>` rasterization with Chrome's Blink GPU compositor via `html-to-image` for 100% pixel fidelity (accurate gradients, frosted glass blurs, and shadows).
+  * Single Slide PNG download (1080×1350 portrait / 1080×1080 square).
+  * 1-click **Download Full Deck (ZIP)** bundling the entire carousel archive.
+  * Official website attribution on every closing CTA slide: `kiln-studioai.vercel.app`.
 
 ---
 
-### 📄 Private Document-Enriched Synergy
+## 🏛️ System Architecture
 
-KILN Studio seamlessly connects your private document library with the public Creator Forge:
-* Enable **"Enrich Research with Context from Document Library"** to ground the agents with your proprietary PDFs, whitepapers, or reports.
-* Or click **"Send to Studio"** directly on any document card to automatically launch a 4-agent creation cycle using that document as context.
-
----
-
-## 🏗️ System Architecture
-
-```text
-┌─────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                     KILN STUDIO UI                                          │
-│         Vite • Tailwind Neobrutalism • Warm Hearth & Flame Palette • Responsive             │
-│   ┌────────────────────────┬─────────────────────────┬──────────────────────────────────┐   │
-│   │ 4-Agent Creator Studio │ Cited PDF Knowledge Base│ Live Fact-Check & News Radar     │   │
-│   └────────────────────────┴─────────────────────────┴──────────────────────────────────┘   │
-└──────────────────────────────────────────────┬──────────────────────────────────────────────┘
-                                               │ HTTP / REST / Server-Sent Events
-                                               ▼
-┌─────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                 FASTAPI APPLICATION ENGINE                                  │
-│                                                                                             │
-│   ┌─────────────────────────────────────────────────────────────────────────────────────┐   │
-│   │                         4-Agent Autonomous Creator Pipeline                         │   │
-│   │   [Researcher Agent] ──► [Verifier Agent] ──► [Writer Agent] ──► [Editor Critic]    │   │
-│   └──────────────────────────┬──────────────────────────────────────────────────────────┘   │
-│                              │                                                              │
-│   ┌──────────────────────────┴─────────────────────────┐  ┌─────────────────────────────┐   │
-│   │ Live RAG & News Stream Service                     │  │ Document Chunker & PDF RAG  │   │
-│   │ (RSS Ingestion • Time-Decay e^-λt • Consensus)     │  │ (Qdrant Vector Collections) │   │
-│   └──────────────────────────┬─────────────────────────┘  └──────────────┬──────────────┘   │
-│                              │                                           │                  │
-│                              ▼                                           ▼                  │
-│   ┌─────────────────────────────────────────────────────────────────────────────────────┐   │
-│   │                             AgentPrahari Security Layer                             │   │
-│   │       Prompt Injection Defense • DAN Jailbreak Shield • PII Redaction Filter        │   │
-│   └─────────────────────────────────────────────────────────────────────────────────────┘   │
-└───────────────────────────┬─────────────────────────────────────────────┬───────────────────┘
-                            │                                             │
-             ┌──────────────┴──────────────┐               ┌──────────────┴──────────────┐
-             ▼                             ▼               ▼                             ▼
-   ┌───────────────────┐         ┌───────────────────┐   ┌───────────────────┐ ┌───────────────┐
-   │   Qdrant Cloud    │         │ Google Gemini     │   │ Groq Cloud        │ │ Anthropic MCP │
-   │ Vector Embeddings │         │ 2.5 Flash / Embed │   │ Qwen 2.5 32B      │ │ Cursor/Claude │
-   └───────────────────┘         └───────────────────┘   └───────────────────┘ └───────────────┘
+```
+                                  KILN STUDIO ARCHITECTURE
+                                  
+ ┌──────────────────────────────────────────────────────────────────────────────────────┐
+ │                              FRONTEND LAYER (Vercel)                                 │
+ │  • index.html (Login)       • signup.html (Registration)  • dashboard.html (Studio) │
+ │  • carousel.html (Forge)    • live_rag.html (Radar)       • chat.html (Cited RAG)   │
+ │  • Tailwind CSS (Neobrutal) • Space Grotesk / Inter       • ES Modules / Vite       │
+ └──────────────────────────────────────────┬───────────────────────────────────────────┘
+                                            │ REST API (JSON / FormData)
+                                            ▼
+ ┌──────────────────────────────────────────────────────────────────────────────────────┐
+ │                             BACKEND API (FastAPI / Render)                           │
+ │                                                                                      │
+ │  ┌───────────────────────┐ ┌────────────────────────┐ ┌───────────────────────────┐  │
+ │  │      Auth Engine      │ │   Content Pipeline     │ │      Live RAG Radar       │  │
+ │  │ • /api/signup         │ │ • 4-Agent Supervisor   │ │ • RSS Feeds (Tech, AI)    │  │
+ │  │ • /api/login          │ │ • Researcher/Verifier  │ │ • Multi-Domain Consensus  │  │
+ │  │ • Supabase + PBKDF2   │ │ • Writer/Critic Loop   │ │ • Time-Decay Scoring      │  │
+ │  └───────────────────────┘ └────────────────────────┘ └───────────────────────────┘  │
+ │  ┌───────────────────────┐ ┌────────────────────────┐ ┌───────────────────────────┐  │
+ │  │     Document RAG      │ │  Security Guardrails   │ │    Anthropic MCP Server   │  │
+ │  │ • PyPDF2 / Chunker    │ │ • AgentPrahari v0.1.0  │ │ • forge_content tool      │  │
+ │  │ • Clickable Citations │ │ • Prompt Injection     │ │ • live_fact_check tool    │  │
+ │  │ • Hybrid Retrieval    │ │ • PII / Leak Scanner   │ │ • check_guardrails tool   │  │
+ │  └───────────────────────┘ └────────────────────────┘ └───────────────────────────┘  │
+ └──────────────────────┬───────────────────┬───────────────────┬───────────────────────┘
+                        │                   │                   │
+                        ▼                   ▼                   ▼
+             ┌─────────────────────┐ ┌─────────────┐ ┌─────────────────────┐
+             │    Qdrant Cloud     │ │  Supabase   │ │    LLM Inference    │
+             │   Vector Database   │ │ Cloud Store │ │ • Groq (Qwen 32B)   │
+             │ 384-dim Embeddings  │ │  and Auth   │ │ • Gemini 2.5 Flash  │
+             └─────────────────────┘ └─────────────┘ └─────────────────────┘
 ```
 
 ---
@@ -245,6 +259,7 @@ Add to your `claude_desktop_config.json`:
 | :--- | :--- |
 | **Frontend** | Vanilla JS (ES Modules), HTML5, Vite, Tailwind CSS (Neobrutalism), Space Grotesk typography |
 | **Backend** | Python 3.11+, FastAPI, Uvicorn, Pydantic, HTTPX, PyPDF2, pdfplumber, BeautifulSoup4, feedparser |
+| **Authentication** | Supabase Auth API + Local PBKDF2-HMAC-SHA256 Salted Hashing |
 | **Security** | [**AgentPrahari**](https://pypi.org/project/agentprahari/) on PyPI |
 | **Vector Database** | Qdrant Cloud (Cosine Similarity), fallback ChromaDB |
 | **LLM Inference** | Groq (Qwen 2.5 32B / Llama 3.3 70B), Google Gemini 2.5 Flash, OpenRouter |
@@ -257,7 +272,7 @@ Add to your `claude_desktop_config.json`:
 ### Prerequisites
 * **Python 3.11+** installed
 * **Node.js 18+** and **npm** installed
-* API Keys for **Gemini**, **Groq**, and **Qdrant Cloud**
+* API Keys for **Gemini**, **Groq**, **Qdrant Cloud**, and **Supabase**
 
 ### 1. Backend Setup
 ```bash
@@ -304,21 +319,25 @@ OPENROUTER_API_KEY=your_openrouter_api_key
 QDRANT_URL=https://your-cluster.qdrant.tech:6333
 QDRANT_API_KEY=your_qdrant_api_key
 QDRANT_COLLECTION_NAME=kiln_documents
+
+# Supabase Auth & Storage
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your_supabase_anon_key
+SUPABASE_BUCKET=docmind
 ```
 
 ---
 
 ## 📡 API Reference
 
+### Authentication Endpoints
+* `POST /api/signup`: Creates a new workspace account (`name`, `email`, `password`).
+* `POST /api/login`: Verifies credentials, registers session, and sets secure auth cookie.
+* `POST /api/logout`: Deregisters active session and clears auth cookies.
+* `GET /api/auth/check`: Validates current session status.
+
+### Creator & Intelligence Endpoints
 * `POST /api/pipeline/run`: Executes the 4-agent creator forge.
-  ```json
-  {
-    "topic": "Frontier AI Reasoning Models",
-    "target_audience": "AI & Software Engineers",
-    "tone": "Authoritative Thought Leadership",
-    "use_pdf_context": false
-  }
-  ```
 * `POST /api/live-rag/search`: Queries live RSS streams and returns consensus matrix.
 * `POST /api/upload`: Uploads and vector-indexes a PDF file into Qdrant.
 * `POST /api/chat`: Performs cited RAG chat on uploaded documents.

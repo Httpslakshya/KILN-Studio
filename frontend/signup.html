@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="/static/kiln-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,600,0,0" />
+  <title>KILN Studio | Create Account</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            paper: '#FDFBF7',
+            card: '#FFFFFF',
+            line: '#1E1B2E',
+            ink: '#1E1B2E',
+            muted: '#524C61',
+            forge: '#FF5B22',
+            forgeSoft: '#FFF0E8',
+            amber: '#FFA629',
+            amberSoft: '#FFF8EB',
+            yellow: '#FFDE59',
+            yellowSoft: '#FFFBE6',
+            violet: '#7B61FF',
+            violetSoft: '#F2EFFF',
+            danger: '#DC2626',
+            dangerSoft: '#FEE2E2',
+            success: '#16A34A',
+            successSoft: '#DCFCE7'
+          },
+          boxShadow: {
+            brutal: '4px 4px 0px #1E1B2E',
+            'brutal-lg': '8px 8px 0px #1E1B2E',
+            'brutal-xl': '12px 12px 0px #1E1B2E'
+          },
+          fontFamily: {
+            display: ['Space Grotesk', 'sans-serif'],
+            body: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Space Grotesk', sans-serif; }
+    .press:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0px #1E1B2E; }
+    .field:focus { outline: none; background: #FFF0E8; box-shadow: 6px 6px 0 #1E1B2E; transform: translate(-2px, -2px); }
+    @keyframes pop { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .pop { animation: pop .35s ease both; }
+  </style>
+</head>
+<body class="min-h-screen bg-paper text-ink selection:bg-forge selection:text-white">
+  <main class="min-h-screen grid lg:grid-cols-[1.05fr_.95fr]">
+    <!-- Left Hero Brand Column -->
+    <section class="hidden lg:flex relative overflow-hidden bg-gradient-to-br from-forgeSoft via-amberSoft to-paper border-r-4 border-line p-12 items-center justify-center">
+      <div class="absolute inset-0 opacity-15" style="background-image: radial-gradient(#1E1B2E 2px, transparent 2px); background-size: 30px 30px;"></div>
+      <div class="absolute top-10 left-10 h-20 w-20 rounded-full bg-forge border-4 border-line shadow-brutal"></div>
+      <div class="absolute bottom-12 right-16 h-28 w-28 bg-card border-4 border-line shadow-brutal rotate-6"></div>
+      
+      <div class="relative z-10 max-w-xl pop">
+        <a href="/" class="mb-8 inline-flex items-center gap-4 bg-card border-4 border-line shadow-brutal px-5 py-4 hover:bg-forgeSoft transition">
+          <img src="/static/kiln-logo.png" alt="KILN Studio logo" class="h-16 w-auto object-contain shrink-0" />
+          <div>
+            <p class="text-xs font-black uppercase tracking-[.22em] text-forge">Creator Platform</p>
+            <h1 class="text-4xl font-black leading-none tracking-tight">KILN Studio</h1>
+          </div>
+        </a>
+
+        <h2 class="text-5xl xl:text-6xl font-black leading-[.98] tracking-tight">
+          Join the autonomous creator forge.
+        </h2>
+        <p class="mt-6 text-xl font-semibold text-muted max-w-lg">
+          Transform raw research and live web data into cited, multi-format creator assets: Articles, LinkedIn Posts, Carousel Decks, and Reel Scripts.
+        </p>
+
+        <div class="mt-8 space-y-3 font-bold text-sm">
+          <div class="flex items-center gap-3">
+            <span class="flex h-7 w-7 items-center justify-center rounded-none bg-forge text-white border-2 border-line font-black">✓</span>
+            <span>Supervisor-governed 4-Agent closed loop with multi-domain verification</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="flex h-7 w-7 items-center justify-center rounded-none bg-amber text-ink border-2 border-line font-black">✓</span>
+            <span>11 aesthetic themes with pixel-perfect 1080px carousel slide export</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="flex h-7 w-7 items-center justify-center rounded-none bg-violet text-white border-2 border-line font-black">✓</span>
+            <span>AgentPrahari prompt injection & security guardrail defense</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Sign Up Form Column -->
+    <section class="flex items-center justify-center p-5 sm:p-8">
+      <div class="w-full max-w-md pop">
+        <!-- Mobile Logo -->
+        <div class="lg:hidden mb-8 flex items-center gap-3">
+          <img src="/static/kiln-logo.png" alt="KILN Studio logo" class="h-12 w-auto object-contain shrink-0" />
+          <strong class="text-3xl font-black tracking-tight">KILN Studio</strong>
+        </div>
+
+        <div class="bg-card border-4 border-line shadow-brutal-lg p-6 sm:p-8">
+          <div class="flex items-center justify-between gap-2 mb-5 flex-wrap">
+            <p class="inline-block bg-forgeSoft text-forge border-2 border-line px-3 py-1 text-xs font-black uppercase tracking-[.16em]">Creator Access</p>
+            <div class="flex border-2 border-line bg-paper">
+              <a href="/index.html" class="px-3 py-1 text-xs font-black bg-paper text-muted hover:text-ink transition">Sign In</a>
+              <span class="px-3 py-1 text-xs font-black bg-forge text-white">Create Account</span>
+            </div>
+          </div>
+
+          <h2 class="text-3xl sm:text-4xl font-black tracking-tight">Create Workspace</h2>
+          <p class="mt-2 text-muted font-semibold text-sm">Register your personal intelligence workspace in KILN Studio.</p>
+
+          <form id="signup-form" class="mt-6 space-y-4" novalidate>
+            <!-- Full Name -->
+            <div>
+              <label for="name" class="block text-sm font-black uppercase tracking-wide mb-1.5">Full Name / Creator Handle</label>
+              <input id="name" name="name" type="text" required placeholder="e.g. Lakshya Dharkar" class="field w-full rounded-none border-4 border-line bg-paper p-3 font-bold transition text-sm sm:text-base" />
+            </div>
+
+            <!-- Email Address -->
+            <div>
+              <label for="email" class="block text-sm font-black uppercase tracking-wide mb-1.5">Email Address</label>
+              <input id="email" name="email" type="email" required placeholder="you@domain.com" class="field w-full rounded-none border-4 border-line bg-paper p-3 font-bold transition text-sm sm:text-base" />
+            </div>
+
+            <!-- Password -->
+            <div>
+              <div class="flex justify-between items-center mb-1.5">
+                <label for="password" class="block text-sm font-black uppercase tracking-wide">Password</label>
+                <span class="text-xs text-muted font-bold">Min 6 characters</span>
+              </div>
+              <input id="password" name="password" type="password" required placeholder="••••••••" class="field w-full rounded-none border-4 border-line bg-paper p-3 font-bold transition text-sm sm:text-base" />
+            </div>
+
+            <!-- Confirm Password -->
+            <div>
+              <label for="confirm-password" class="block text-sm font-black uppercase tracking-wide mb-1.5">Confirm Password</label>
+              <input id="confirm-password" name="confirm-password" type="password" required placeholder="••••••••" class="field w-full rounded-none border-4 border-line bg-paper p-3 font-bold transition text-sm sm:text-base" />
+            </div>
+
+            <!-- Submit Button -->
+            <button id="signup-btn" type="submit" class="press shadow-brutal w-full bg-forge text-white border-4 border-line p-3 sm:p-3.5 font-black uppercase text-base sm:text-lg flex items-center justify-center gap-2 hover:bg-forge/90 transition">
+              <span id="btn-label">Create Workspace</span>
+              <span class="material-symbols-outlined text-xl">arrow_forward</span>
+            </button>
+          </form>
+
+          <!-- Divider -->
+          <div class="my-6 flex items-center gap-3">
+            <div class="h-1 flex-1 bg-ink"></div>
+            <span class="font-black text-xs uppercase tracking-[.16em]">or</span>
+            <div class="h-1 flex-1 bg-ink"></div>
+          </div>
+
+          <!-- Instant Guest Demo Option -->
+          <button id="guest-btn" type="button" class="press shadow-brutal w-full bg-card border-4 border-line p-3 sm:p-3.5 font-black uppercase text-sm sm:text-base flex items-center justify-center gap-3 hover:bg-forgeSoft transition">
+            <span class="material-symbols-outlined text-forge">local_fire_department</span>
+            Continue as Guest (1-Click)
+          </button>
+
+          <!-- Switch to Sign In Link -->
+          <p class="mt-5 text-center text-muted font-semibold text-xs sm:text-sm">
+            Already have an account? 
+            <a href="/index.html" class="font-black text-violet hover:underline underline-offset-4">Sign in directly</a>
+          </p>
+
+          <!-- Status / Error Notification Box -->
+          <p id="signup-status" class="mt-4 hidden border-4 border-line p-3 font-bold text-sm"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/src/signup.js"></script>
+</body>
+</html>

@@ -14,8 +14,12 @@ def get_storage_service():
     
     if provider == "supabase":
         logger.info("Instantiating SupabaseStorage provider.")
-        from backend.storage.supabase import SupabaseStorage
-        _storage_service = SupabaseStorage()
+        try:
+            from backend.storage.supabase import SupabaseStorage
+            _storage_service = SupabaseStorage()
+        except Exception as e:
+            logger.warning(f"Could not initialize SupabaseStorage ({e}). Falling back to LocalStorage.")
+            _storage_service = LocalStorage()
     elif provider == "local":
         logger.info("Instantiating LocalStorage provider.")
         _storage_service = LocalStorage()

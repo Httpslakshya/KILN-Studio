@@ -2,6 +2,7 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/login", "destination": "/index.html" },
+    { "source": "/signup", "destination": "/signup.html" },
     { "source": "/dashboard", "destination": "/dashboard.html" },
     { "source": "/carousel", "destination": "/carousel.html" },
     { "source": "/processing", "destination": "/processing.html" },

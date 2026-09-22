@@ -143,11 +143,11 @@ class UserService:
         """
         normalized_email = email.strip().lower()
 
-        # Handle guest demo credentials seamlessly
-        if normalized_email in ("guest@docmind.local", "guest@kiln.local"):
+        # Handle guest and demo credentials seamlessly
+        if normalized_email in ("guest@docmind.local", "guest@kiln.local", "demo@kiln.local", "new-user@docmind.local"):
             return {
                 "email": normalized_email,
-                "full_name": "Guest Creator",
+                "full_name": "Demo Creator" if "new-user" in normalized_email or "demo" in normalized_email else "Guest Creator",
                 "is_guest": True
             }
 

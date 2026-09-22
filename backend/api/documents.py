@@ -14,44 +14,62 @@ from backend.utils.logging_config import logger
 router = APIRouter(tags=["Documents"])
 
 # ---------------------------------------------------------------------------
-# Supabase job status helpers (restart-proof — no more in-memory dict)
+# Supabase + local job status helpers (resilient dual-layer tracking)
 # ---------------------------------------------------------------------------
 
+_local_indexing_jobs: dict[str, dict] = {}
+
 def _get_supabase():
-    """Returns a Supabase client instance."""
-    from supabase import create_client
-    return create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+    """Returns a Supabase client instance or None if unavailable."""
+    if not settings.SUPABASE_URL or not settings.SUPABASE_KEY:
+        return None
+    try:
+        from supabase import create_client
+        return create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+    except Exception as e:
+        logger.warning(f"Supabase client unavailable: {e}")
+        return None
 
 def _job_create(job_id: str, filename: str):
-    """Inserts a new indexing job record into Supabase."""
-    try:
-        _get_supabase().table("indexing_jobs").insert({
-            "job_id": job_id,
-            "filename": filename,
-            "status": "queued",
-            "progress": 0,
-            "pages": 0,
-            "error": None
-        }).execute()
-    except Exception as e:
-        logger.warning(f"Could not persist job {job_id} to Supabase: {e}")
+    """Inserts a new indexing job record into local cache and Supabase."""
+    job_record = {
+        "job_id": job_id,
+        "filename": filename,
+        "status": "queued",
+        "progress": 0,
+        "pages": 0,
+        "error": None
+    }
+    _local_indexing_jobs[job_id] = job_record
+    sb = _get_supabase()
+    if sb:
+        try:
+            sb.table("indexing_jobs").insert(job_record).execute()
+        except Exception as e:
+            logger.warning(f"Could not persist job {job_id} to Supabase: {e}")
 
 def _job_update(job_id: str, **kwargs):
-    """Updates fields on an existing indexing job record in Supabase."""
-    try:
-        _get_supabase().table("indexing_jobs").update(kwargs).eq("job_id", job_id).execute()
-    except Exception as e:
-        logger.warning(f"Could not update job {job_id} in Supabase: {e}")
+    """Updates fields on an existing indexing job record in local cache and Supabase."""
+    if job_id in _local_indexing_jobs:
+        _local_indexing_jobs[job_id].update(kwargs)
+    sb = _get_supabase()
+    if sb:
+        try:
+            sb.table("indexing_jobs").update(kwargs).eq("job_id", job_id).execute()
+        except Exception as e:
+            logger.warning(f"Could not update job {job_id} in Supabase: {e}")
 
 def _job_get(job_id: str):
-    """Fetches a single indexing job record from Supabase. Returns dict or None."""
-    try:
-        result = _get_supabase().table("indexing_jobs").select("*").eq("job_id", job_id).execute()
-        if result.data:
-            return result.data[0]
-    except Exception as e:
-        logger.warning(f"Could not fetch job {job_id} from Supabase: {e}")
-    return None
+    """Fetches a single indexing job record from Supabase or local cache."""
+    sb = _get_supabase()
+    if sb:
+        try:
+            result = sb.table("indexing_jobs").select("*").eq("job_id", job_id).execute()
+            if result.data:
+                return result.data[0]
+        except Exception as e:
+            logger.warning(f"Could not fetch job {job_id} from Supabase: {e}")
+    return _local_indexing_jobs.get(job_id)
 
 # ---------------------------------------------------------------------------
 # Local JSON document catalog helpers
@@ -79,8 +97,68 @@ def save_documents_db(db):
         logger.error(f"Failed to write documents DB: {e}")
 
 # ---------------------------------------------------------------------------
-# Background indexing worker
 # ---------------------------------------------------------------------------
+# Background indexing worker with rate-limit backoff
+# ---------------------------------------------------------------------------
+
+import re
+import time
+
+def _index_chunks_with_backoff(vector_db, chunks, job_id: str = None, batch_size: int = 30):
+    """
+    Indexes chunks into Qdrant in batches with polite pacing and
+    automatic backoff retry for Gemini rate limits (429 RESOURCE_EXHAUSTED).
+    """
+    total_chunks = len(chunks)
+    logger.info(f"Indexing {total_chunks} chunks in batches of {batch_size} with rate-limit protection.")
+
+    for i in range(0, total_chunks, batch_size):
+        batch = chunks[i:i + batch_size]
+        batch_num = (i // batch_size) + 1
+        total_batches = (total_chunks + batch_size - 1) // batch_size
+
+        max_retries = 5
+        for attempt in range(1, max_retries + 1):
+            try:
+                logger.info(f"Indexing batch {batch_num}/{total_batches} ({len(batch)} chunks)...")
+                vector_db.add_documents(batch)
+                break
+            except Exception as e:
+                err_str = str(e)
+                is_rate_limit = "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "quota" in err_str.lower()
+                if is_rate_limit and attempt < max_retries:
+                    # Extract suggested delay if available, default to 45s
+                    delay_match = re.search(r"retry\s+in\s+([0-9.]+)\s*s", err_str, re.IGNORECASE)
+                    if not delay_match:
+                        delay_match = re.search(r"'retryDelay':\s*'([0-9]+)s'", err_str)
+                    
+                    delay = int(float(delay_match.group(1))) + 3 if delay_match else (30 * attempt)
+                    delay = max(20, min(delay, 90))
+
+                    logger.warning(
+                        f"Rate limit reached on batch {batch_num}/{total_batches} (attempt {attempt}/{max_retries}). "
+                        f"Pausing for {delay}s before auto-resuming: {err_str[:120]}..."
+                    )
+                    if job_id:
+                        _job_update(
+                            job_id,
+                            status="rate_limited",
+                            error=f"Gemini API rate limit reached. Pausing for {delay}s before auto-resuming..."
+                        )
+                    time.sleep(delay)
+                    if job_id:
+                        _job_update(job_id, status="processing", error=None)
+                else:
+                    logger.error(f"Failed to index batch {batch_num}/{total_batches}: {e}")
+                    raise
+
+        # Update progress smoothly between 45% and 90%
+        if job_id:
+            completed_pct = int(45 + ((i + len(batch)) / total_chunks) * 45)
+            _job_update(job_id, progress=min(completed_pct, 90), status="processing")
+
+        # Brief yield between batches to keep event loop responsive
+        time.sleep(0.05)
 
 async def bg_index_document(job_id: str, filename: str, file_path: str):
     """Background task to load, chunk, embed, and index a PDF document."""
@@ -95,24 +173,23 @@ async def bg_index_document(job_id: str, filename: str, file_path: str):
         page_count = len(docs)
         logger.info(f"Loaded {page_count} pages for job {job_id}.")
 
-        # Step 2: Chunking
+        # Step 2: Chunking (using 1500 chars with 200 overlap to optimize chunk count)
         _job_update(job_id, progress=45)
         from langchain_text_splitters import RecursiveCharacterTextSplitter
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=400)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=200)
         chunks = text_splitter.split_documents(docs)
 
         for chunk in chunks:
             chunk.metadata["source"] = filename
             chunk.metadata["page_label"] = str(chunk.metadata.get("page", 0) + 1)
 
-        # Step 3: Embed + index into Qdrant
-        _job_update(job_id, progress=70)
+        # Step 3: Embed + index into Qdrant with rate-limiting & backoff
         from backend.vectorstore.qdrant import get_vector_db
         vector_db = get_vector_db()
-        vector_db.add_documents(chunks)
+        _index_chunks_with_backoff(vector_db, chunks, job_id=job_id, batch_size=30)
 
         # Step 4: Persist metadata catalog
-        _job_update(job_id, progress=90)
+        _job_update(job_id, progress=92)
         db = load_documents_db()
         file_size_formatted = format_size(os.path.getsize(file_path))
         storage_url = storage_service.get_file_url(filename)
@@ -144,17 +221,19 @@ async def bg_index_document(job_id: str, filename: str, file_path: str):
         save_documents_db(db)
 
         # Step 5: Mark completed
-        _job_update(job_id, status="completed", progress=100, pages=page_count)
+        _job_update(job_id, status="completed", progress=100, pages=page_count, error=None)
         logger.info(f"Indexing completed for job {job_id} ({filename})")
 
     except Exception as e:
         logger.error(f"Background indexing failed for job {job_id} ({filename}): {e}", exc_info=True)
         _job_update(job_id, status="failed", progress=0, error=str(e))
 
-        try:
-            storage_service.delete_file(filename)
-        except Exception as cleanup_err:
-            logger.warning(f"Cleanup failed for {filename}: {cleanup_err}")
+        # Avoid deleting file on transient rate limits
+        if "429" not in str(e) and "RESOURCE_EXHAUSTED" not in str(e):
+            try:
+                storage_service.delete_file(filename)
+            except Exception as cleanup_err:
+                logger.warning(f"Cleanup failed for {filename}: {cleanup_err}")
 
 # ---------------------------------------------------------------------------
 # Routes
@@ -224,7 +303,15 @@ def serve_document(filename: str):
         return error_response(message="Document not found", status_code=404)
 
     file_path = storage_service.get_file_path(sanitized)
-    return FileResponse(file_path, media_type="application/pdf")
+    return FileResponse(
+        file_path,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"inline; filename=\"{sanitized}\"",
+            "X-Frame-Options": "ALLOWALL",
+            "Access-Control-Allow-Origin": "*",
+        }
+    )
 
 @router.delete("/api/document/{filename}")
 def delete_document(filename: str):
@@ -318,6 +405,24 @@ def get_upload_status(job_id: str):
         data=job,
         message="Background job status retrieved successfully"
     )
+
+@router.get("/api/upload/latest-job")
+def get_latest_job():
+    """Retrieves the most recent active or incomplete indexing job."""
+    for jid, job in reversed(list(_local_indexing_jobs.items())):
+        if job.get("status") in ["queued", "processing", "rate_limited"]:
+            return success_response(data=job, message="Active indexing job found")
+
+    sb = _get_supabase()
+    if sb:
+        try:
+            res = sb.table("indexing_jobs").select("*").in_("status", ["queued", "processing", "rate_limited"]).limit(1).execute()
+            if res.data:
+                return success_response(data=res.data[0], message="Active indexing job found in Supabase")
+        except Exception as e:
+            logger.warning(f"Could not check active jobs in Supabase: {e}")
+
+    return success_response(data=None, message="No active indexing jobs")
 
 def seed_documents():
     """Copies seeded documents from agentic resources if database catalog is empty."""

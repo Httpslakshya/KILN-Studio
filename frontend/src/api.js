@@ -60,8 +60,21 @@ export async function apiGet(endpoint, options = {}) {
 export function checkAuth() {
   const sessionId = localStorage.getItem('session_id');
   if (!sessionId) {
-    window.location.href = '/login';
+    window.location.href = '/index.html';
     return null;
   }
   return sessionId;
+}
+
+export async function logout() {
+  try {
+    await apiFetch('/api/logout', { method: 'POST' });
+  } catch (err) {
+    console.warn('Backend logout call returned error:', err);
+  } finally {
+    localStorage.removeItem('session_id');
+    localStorage.removeItem('docmind_session');
+    localStorage.removeItem('kiln_session');
+    window.location.href = '/index.html';
+  }
 }

@@ -5,11 +5,10 @@ Live Verified RAG & Multi-Agent Content Pipeline Router.
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 from typing import Optional
-from backend.services.live_rag.engine import LiveVerifiedRAGEngine
+from backend.services.live_rag.engine import LiveVerifiedRAGEngine, AgentPrahari
 from backend.services.content_pipeline.orchestrator import MultiAgentContentOrchestrator
 from backend.models.schemas import success_response, error_response
 from backend.utils.logging_config import logger
-from agentprahari import AgentPrahari
 
 router = APIRouter(prefix="/api/live-rag", tags=["Live Verified RAG"])
 

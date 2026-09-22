@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load root .env variables with override=True to ensure workspace keys take precedence
+# Load root .env variables with override=True to ensure workspace keys take precedence (Updated Qdrant Cloud Cluster)
 load_dotenv(override=True)
 
 # Build paths inside the project

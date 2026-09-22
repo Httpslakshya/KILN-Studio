@@ -79,44 +79,55 @@
         </div>
 
         <div class="bg-card border-4 border-line shadow-brutal-lg p-6 sm:p-8">
-          <p class="inline-block bg-forgeSoft text-forge border-2 border-line px-3 py-1 text-xs font-black uppercase tracking-[.16em]">Intelligence Forge</p>
-          <h2 class="mt-5 text-4xl font-black tracking-tight">Welcome back</h2>
-          <p class="mt-2 text-muted font-semibold">Enter your workspace to start forging content and querying documents.</p>
+          <div class="flex items-center justify-between gap-2 mb-5 flex-wrap">
+            <p class="inline-block bg-forgeSoft text-forge border-2 border-line px-3 py-1 text-xs font-black uppercase tracking-[.16em]">Intelligence Forge</p>
+            <div class="flex border-2 border-line bg-paper">
+              <button id="tab-login" type="button" class="px-3 py-1 text-xs font-black bg-forge text-white transition">Sign In</button>
+              <button id="tab-signup" type="button" class="px-3 py-1 text-xs font-black bg-paper text-muted hover:text-ink transition">Create Account</button>
+            </div>
+          </div>
 
-          <form id="login-form" class="mt-7 space-y-4" novalidate>
-            <div>
-              <label for="email" class="block text-sm font-black uppercase tracking-wide mb-2">Email</label>
-              <input id="email" name="email" type="email" required placeholder="you@example.com" class="field w-full rounded-none border-4 border-line bg-paper p-4 font-bold transition" />
+          <h2 id="auth-title" class="text-3xl sm:text-4xl font-black tracking-tight">Welcome back</h2>
+          <p id="auth-subtitle" class="mt-2 text-muted font-semibold text-sm">Enter your workspace to start forging content and querying documents.</p>
+
+          <form id="login-form" class="mt-6 space-y-4" novalidate>
+            <div id="name-field-group" class="hidden">
+              <label for="name" class="block text-sm font-black uppercase tracking-wide mb-1.5">Full Name</label>
+              <input id="name" name="name" type="text" placeholder="Your Name" class="field w-full rounded-none border-4 border-line bg-paper p-3 font-bold transition text-sm sm:text-base" />
             </div>
             <div>
-              <label for="password" class="block text-sm font-black uppercase tracking-wide mb-2">Password</label>
-              <input id="password" name="password" type="password" required placeholder="password" class="field w-full rounded-none border-4 border-line bg-paper p-4 font-bold transition" />
+              <label for="email" class="block text-sm font-black uppercase tracking-wide mb-1.5">Email</label>
+              <input id="email" name="email" type="email" required placeholder="you@example.com" class="field w-full rounded-none border-4 border-line bg-paper p-3 font-bold transition text-sm sm:text-base" />
             </div>
-            <div class="flex items-center justify-between gap-3 text-sm font-bold">
+            <div>
+              <label for="password" class="block text-sm font-black uppercase tracking-wide mb-1.5">Password</label>
+              <input id="password" name="password" type="password" required placeholder="••••••••" class="field w-full rounded-none border-4 border-line bg-paper p-3 font-bold transition text-sm sm:text-base" />
+            </div>
+            <div id="remember-group" class="flex items-center justify-between gap-3 text-xs sm:text-sm font-bold">
               <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" class="rounded-none border-4 border-line text-violet focus:ring-0" />
+                <input type="checkbox" checked class="rounded-none border-4 border-line text-violet focus:ring-0" />
                 Remember me
               </label>
-              <button type="button" id="forgot-btn" class="text-violet hover:underline underline-offset-4 font-black">Forgot password?</button>
+              <button type="button" id="forgot-btn" class="text-violet hover:underline underline-offset-4 font-black">Need help?</button>
             </div>
-            <button id="signin-btn" type="submit" class="press shadow-brutal w-full bg-forge text-white border-4 border-line p-4 font-black uppercase text-lg flex items-center justify-center gap-2 hover:bg-forge/90">
-              <span>Enter Forge</span>
-              <span class="material-symbols-outlined">arrow_forward</span>
+            <button id="signin-btn" type="submit" class="press shadow-brutal w-full bg-forge text-white border-4 border-line p-3 sm:p-3.5 font-black uppercase text-base sm:text-lg flex items-center justify-center gap-2 hover:bg-forge/90">
+              <span id="btn-label">Enter Forge</span>
+              <span class="material-symbols-outlined text-xl">arrow_forward</span>
             </button>
           </form>
 
-          <div class="my-7 flex items-center gap-3">
+          <div class="my-6 flex items-center gap-3">
             <div class="h-1 flex-1 bg-ink"></div>
             <span class="font-black text-xs uppercase tracking-[.16em]">or</span>
             <div class="h-1 flex-1 bg-ink"></div>
           </div>
 
-          <button id="google-login-btn" type="button" class="press shadow-brutal w-full bg-card border-4 border-line p-4 font-black uppercase text-lg flex items-center justify-center gap-3 hover:bg-forgeSoft">
+          <button id="google-login-btn" type="button" class="press shadow-brutal w-full bg-card border-4 border-line p-3 sm:p-3.5 font-black uppercase text-sm sm:text-base flex items-center justify-center gap-3 hover:bg-forgeSoft">
             <span class="material-symbols-outlined text-forge">local_fire_department</span>
             Continue as Guest
           </button>
-          <p class="mt-6 text-center text-muted font-semibold">Instant access? <button id="signup-btn" class="font-black text-violet hover:underline underline-offset-4">Start with demo access</button></p>
-          <p id="login-status" class="mt-4 hidden border-4 border-line bg-dangerSoft p-3 font-bold text-danger"></p>
+          <p class="mt-5 text-center text-muted font-semibold text-xs sm:text-sm">Don't have an account? <a href="/signup.html" class="font-black text-violet hover:underline underline-offset-4">Create an account</a></p>
+          <p id="login-status" class="mt-4 hidden border-4 border-line bg-dangerSoft p-3 font-bold text-danger text-sm"></p>
         </div>
       </div>
     </section>
