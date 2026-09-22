@@ -17,8 +17,8 @@
 
   <p>
     🔗 <strong>Live App:</strong> <a href="https://kiln-studioai.vercel.app" target="_blank"><strong>https://kiln-studioai.vercel.app</strong></a> &nbsp;|&nbsp;
-    ⚡ <strong>API Endpoint:</strong> <a href="https://docmind-8qsv.onrender.com" target="_blank"><strong>https://docmind-8qsv.onrender.com</strong></a> &nbsp;|&nbsp;
-    📚 <strong>Swagger Docs:</strong> <a href="https://docmind-8qsv.onrender.com/docs" target="_blank"><strong>/docs</strong></a>
+    <!-- ⚡ <strong>API Endpoint:</strong> <a href="https://docmind-8qsv.onrender.com" target="_blank"><strong>https://docmind-8qsv.onrender.com</strong></a> &nbsp;|&nbsp; -->
+    <!-- 📚 <strong>Swagger Docs:</strong> <a href="https://docmind-8qsv.onrender.com/docs" target="_blank"><strong>/docs</strong></a> -->
   </p>
 </div>
 
